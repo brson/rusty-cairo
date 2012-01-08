@@ -1,10 +1,257 @@
 #[link(name = "cairo", vers = "0.1", author = "Zack0Wack0")];
+#[crate_type = "lib"];
 
 use std;
 import std::{fs};
 
-/* FIXME all wrapped objects need to be cached rather than 
-recreating new objects every time for each internal cairo pointer
+export 
+	STATUS_SUCCESS,
+	STATUS_NO_MEMORY,
+	STATUS_INVALID_RESTORE,
+	STATUS_INVALID_POP_GROUP,
+	STATUS_NO_CURRENT_POINT,
+	STATUS_INVALID_MATRIX,
+	STATUS_INVALID_STATUS,
+	STATUS_NULL_POINTER,
+	STATUS_INVALID_STRING,
+	STATUS_INVALID_PATH_DATA,
+	STATUS_READ_ERROR,
+	STATUS_WRITE_ERROR,
+	STATUS_SURFACE_FINISHED,
+	STATUS_SURFACE_TYPE_MISMATCH,
+	STATUS_PATTERN_TYPE_MISMATCH,
+	STATUS_INVALID_CONTENT,
+	STATUS_INVALID_FORMAT,
+	STATUS_INVALID_VISUAL,
+	STATUS_FILE_NOT_FOUND,
+	STATUS_INVALID_DASH,
+	STATUS_INVALID_DSC_COMMENT,
+	STATUS_INVALID_INDEX,
+	STATUS_CLIP_NOT_REPRESENTABLE,
+	STATUS_TEMP_FILE_ERROR,
+	STATUS_INVALID_STRIDE,
+	STATUS_FONT_TYPE_MISMATCH,
+	STATUS_USER_FONT_IMMUTABLE,
+	STATUS_USER_FONT_ERROR,
+	STATUS_NEGATIVE_COUNT,
+	STATUS_INVALID_CLUSTERS,
+	STATUS_INVALID_SLANT,
+	STATUS_INVALID_WEIGHT,
+	STATUS_INVALID_SIZE,
+	STATUS_USER_FONT_NOT_IMPLEMENTED,
+	STATUS_DEVICE_TYPE_MISMATCH,
+	STATUS_DEVICE_ERROR,
+	STATUS_LAST_STATUS,
+	status,
+	status_to_str,
+
+	FORMAT_INVALID,
+	FORMAT_ARGB32,
+	FORMAT_RGB24,
+	FORMAT_A8,
+	FORMAT_A1,
+	FORMAT_RGB16_565,
+	format,
+	format_stride_for_width,
+
+	FONT_SLANT_NORMAL,
+	FONT_SLANT_ITALIC,
+	FONT_SLANT_OBLIQUE,
+	font_slant,
+
+	FONT_WEIGHT_NORMAL,
+	FONT_WEIGHT_BOLD,
+	font_weight,
+
+	ANTIALIAS_DEFAULT,
+	ANTIALIAS_NONE,
+	ANTIALIAS_GRAY,
+	ANTIALIAS_SUBPIXEL,
+	antialias,
+
+	FILL_RULE_WINDING,
+	FILL_RULE_EVEN_ODD,
+	fill_rule,
+
+	LINE_CAP_BUTT,
+	LINE_CAP_ROUND,
+	LINE_CAP_SQUARE,
+	line_cap,
+
+	LINE_JOIN_MITER,
+	LINE_JOIN_ROUND,
+	LINE_JOIN_BEVEL,
+	line_join,
+
+	OPERATOR_CLEAR,
+	OPERATOR_SOURCE,
+	OPERATOR_OVER,
+	OPERATOR_IN,
+	OPERATOR_OUT,
+	OPERATOR_ATOP,
+	OPERATOR_DEST,
+	OPERATOR_DEST_OVER,
+	OPERATOR_DEST_IN,
+	OPERATOR_DEST_OUT,
+	OPERATOR_DEST_ATOP,
+	OPERATOR_XOR,
+	OPERATOR_ADD,
+	OPERATOR_SATURATE,
+	OPERATOR_MULTIPLY,
+	OPERATOR_SCREEN,
+	OPERATOR_OVERLAY,
+	OPERATOR_DARKEN,
+	OPERATOR_LIGHTEN,
+	OPERATOR_COLOR_DODGE,
+	OPERATOR_COLOR_BURN,
+	OPERATOR_HARD_LIGHT,
+	OPERATOR_SOFT_LIGHT,
+	OPERATOR_DIFFERENCE,
+	OPERATOR_EXCLUSION,
+	OPERATOR_HSL_HUE,
+	OPERATOR_HSL_SATURATION,
+	OPERATOR_HSL_COLOR,
+	OPERATOR_HSL_LUMINOSITY,
+	operator,
+
+	CONTENT_COLOR,
+	CONTENT_ALPHA,
+	CONTENT_COLOR_ALPHA,
+	content,
+
+	SURFACE_TYPE_IMAGE,
+	SURFACE_TYPE_PDF,
+	SURFACE_TYPE_PS,
+	SURFACE_TYPE_XLIB,
+	SURFACE_TYPE_XCB,
+	SURFACE_TYPE_GLITZ,
+	SURFACE_TYPE_QUARTZ,
+	SURFACE_TYPE_WIN32,
+	SURFACE_TYPE_BEOS,
+	SURFACE_TYPE_DIRECTFB,
+	SURFACE_TYPE_SVG,
+	SURFACE_TYPE_OS2,
+	SURFACE_TYPE_WIN32_PRINTING,
+	SURFACE_TYPE_QUARTZ_IMAGE,
+	SURFACE_TYPE_SCRIPT,
+	SURFACE_TYPE_QT,
+	SURFACE_TYPE_RECORDING,
+	SURFACE_TYPE_VG,
+	SURFACE_TYPE_GL,
+	SURFACE_TYPE_DRM,
+	SURFACE_TYPE_TEE,
+	SURFACE_TYPE_XML,
+	SURFACE_TYPE_SKIA,
+	SURFACE_TYPE_SUBSURFACE,
+	surface_type,
+
+	TEXT_CLUSTER_FLAG_BACKWARD,
+	text_cluster_flags,
+
+	SUBPIXEL_ORDER_DEFAULT,
+	SUBPIXEL_ORDER_RGB,
+	SUBPIXEL_ORDER_BGR,
+	SUBPIXEL_ORDER_VRGB,
+	SUBPIXEL_ORDER_VBGR,
+	subpixel_order,
+
+	HINT_STYLE_DEFAULT,
+	HINT_STYLE_NONE,
+	HINT_STYLE_SLIGHT,
+	HINT_STYLE_MEDIUM,
+	HINT_STYLE_FULL,
+	hint_style,
+
+	HINT_METRICS_DEFAULT,
+	HINT_METRICS_OFF,
+	HINT_METRICS_ON,
+
+	hint_metrics,
+
+	FONT_TYPE_TOY,
+	FONT_TYPE_FT,
+	FONT_TYPE_WIN32,
+	FONT_TYPE_QUARTZ,
+	FONT_TYPE_USER,
+	font_type,
+
+	font_extents_record,
+	text_extents_record,
+	matrix_record,
+	glyph_record,
+	text_cluster_record,
+
+	DEVICE_TYPE_DRM,
+	DEVICE_TYPE_GL,
+	DEVICE_TYPE_SCRIPT,
+	DEVICE_TYPE_XCB,
+	DEVICE_TYPE_XLIB,
+	DEVICE_TYPE_XML,
+	device_type,
+
+	EXTEND_NONE,
+	EXTEND_REPEAT,
+	EXTEND_REFLECT,
+	EXTEND_PAD,
+	extend,
+
+	FILTER_FAST,
+	FILTER_GOOD,
+	FILTER_BEST,
+	FILTER_NEAREST,
+	FILTER_BILINEAR,
+	FILTER_GAUSSIAN,
+	filter,
+
+	PATTERN_TYPE_SOLID,
+	PATTERN_TYPE_SURFACE,
+	PATTERN_TYPE_LINEAR,
+	PATTERN_TYPE_RADIAL,
+	pattern_type,
+
+	device,
+	surface,
+	mk_surface_from_similar,
+	mk_image_surface,
+	mk_image_surface_from_file,
+	mk_image_surface_from_data,
+
+	pattern,
+	mk_pattern_from_rgb,
+	mk_pattern_from_rgba,
+	mk_pattern_from_linear_gradient,
+	mk_pattern_from_radial_gradient,
+	mk_pattern_from_surface,
+
+	matrix,
+	mk_matrix,
+
+	path,
+
+	glyph,
+	mk_glyph,
+
+	text_cluster,
+	mk_text_cluster,
+
+	font_extents,
+	text_extents,
+
+	font_face,
+	mk_font_face_from_toy_font,
+
+	scaled_font,
+
+	font_options,
+	mk_font_options,
+	mk_font_options_from_copy,
+
+	context,
+	mk_context;
+
+/*
+ * FIXME all wrapped objects need to be cached rather than 
+ * recreating new objects every time for each internal cairo pointer
 */
 
 #[link_name = "cairo"]
@@ -272,8 +519,8 @@ const STATUS_LAST_STATUS: int = 36;
 
 type status = int;
 
-fn status_to_string(status: status) -> str unsafe {
-	ret str::str_from_cstr(ccairo::cairo_status_to_string(status));
+fn status_to_str(status: status) -> str unsafe {
+	ret str::from_cstr(ccairo::cairo_status_to_string(status));
 }
 
 const FORMAT_INVALID: int = -1;
@@ -285,7 +532,7 @@ const FORMAT_RGB16_565: int = 4;
 
 type format = int;
 
-fn stride_for_width(format: format, width: int) -> int {
+fn format_stride_for_width(format: format, width: int) -> int {
 	ret ccairo::cairo_format_stride_for_width(format, width);
 }
 
@@ -472,19 +719,19 @@ const EXTEND_PAD: int = 3;
 
 type extend = int;
 
-const CAIRO_FILTER_FAST: int = 0;
-const CAIRO_FILTER_GOOD: int = 1;
-const CAIRO_FILTER_BEST: int = 2;
-const CAIRO_FILTER_NEAREST: int = 3;
-const CAIRO_FILTER_BILINEAR: int = 4;
-const CAIRO_FILTER_GAUSSIAN: int = 5;
+const FILTER_FAST: int = 0;
+const FILTER_GOOD: int = 1;
+const FILTER_BEST: int = 2;
+const FILTER_NEAREST: int = 3;
+const FILTER_BILINEAR: int = 4;
+const FILTER_GAUSSIAN: int = 5;
 
 type filter = int;
 
-const CAIRO_PATTERN_TYPE_SOLID: int = 0;
-const CAIRO_PATTERN_TYPE_SURFACE: int = 1;
-const CAIRO_PATTERN_TYPE_LINEAR: int = 2;
-const CAIRO_PATTERN_TYPE_RADIAL: int = 3;
+const PATTERN_TYPE_SOLID: int = 0;
+const PATTERN_TYPE_SURFACE: int = 1;
+const PATTERN_TYPE_LINEAR: int = 2;
+const PATTERN_TYPE_RADIAL: int = 3;
 
 type pattern_type = int;
 
@@ -1079,7 +1326,7 @@ obj font_face(internal: ctypes::intptr_t, res: @font_face_res) {
 		ret ccairo::cairo_toy_font_face_get_weight(internal) as font_weight;
 	}
 	fn get_toy_family() -> str unsafe {
-		ret str::str_from_cstr(ccairo::cairo_toy_font_face_get_family(internal));
+		ret str::from_cstr(ccairo::cairo_toy_font_face_get_family(internal));
 	}
 	
 	// Misc
