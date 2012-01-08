@@ -1,8 +1,8 @@
 use std;
 use cairo;
 
-const WIDTH: int = 80;
-const HEIGHT: int = 80;
+const WIDTH: uint = 80u;
+const HEIGHT: uint = 80u;
 const PI: float = 3.141592653589793;
 
 fn rounded_rectangle(context: cairo::context, x: float, y: float, w: float, h: float, r: float)

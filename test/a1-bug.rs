@@ -1,8 +1,8 @@
 use std;
 use cairo;
 
-const WIDTH: int = 1000;
-const HEIGHT: int = 800;
+const WIDTH: uint = 1000u;
+const HEIGHT: uint = 800u;
 
 #[test]
 fn test() {

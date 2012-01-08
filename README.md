@@ -21,7 +21,7 @@ To build this library, make sure you have all the dependencies. Open up your ter
 make
 ```
 
-The library file will then be built into lib (if there were no errors during building). You can then bundle this library file inside your Rust project and use Rust's command line option -L to point it to the folder the library is installed in.
+The library file will then be built into the `lib` directory (if there were no errors during building). You can then bundle this library file inside your Rust project and use Rust's command line option -L to point it to the folder the library is installed in.
 
 To then use the library in your project, you use Rust's `use` statement:
 
@@ -34,7 +34,7 @@ The library currently requires the std module and for some reason rust refuses t
 
 ## Testing
 
-To run the tests, type:
+To run the tests, type in the terminal:
 
 ```sh
 make test

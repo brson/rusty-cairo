@@ -3,7 +3,7 @@ use cairo;
 
 #[test]
 fn test() {
-	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, 0, 0);
+	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, 0u, 0u);
 	let context: cairo::context = cairo::mk_context(surface);
 	let font: cairo::font_face = context.get_font_face();
 	

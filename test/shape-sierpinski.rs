@@ -1,8 +1,8 @@
 use std;
 use cairo;
 
-const WIDTH: int = 1024;
-const HEIGHT: int = 600;
+const WIDTH: uint = 1024u;
+const HEIGHT: uint = 600u;
 
 const FRAC_1_SQRT_3: float = 0.577359269;
 
@@ -32,7 +32,7 @@ fn triangle(context: cairo::context, size: float)
 #[test]
 fn test()
 {
-	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, WIDTH, 2 * HEIGHT);
+	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, WIDTH, 2u * HEIGHT);
 	let context: cairo::context = cairo::mk_context(surface);
 	
 	context.set_source_rgb(1.0, 1.0, 1.0);

@@ -1,7 +1,5 @@
-TEST_FILES := $(wildcard test/*.rs)
-
 all:
-	rustc --lib ./src/crate.rs --out-dir=./lib
+	rustc --lib ./src/cairo.rs --out-dir=./lib
 test: all
 	rustc --test -L ./lib ./test/a1-bug.rs -o ./test/a1-bug.elf
 	rustc --test -L ./lib ./test/rounded-rectangle-fill.rs -o ./test/rounded-rectangle-fill.elf

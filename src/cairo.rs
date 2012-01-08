@@ -3,6 +3,7 @@
 
 use std;
 import std::{fs};
+import core::{ptr, vec, str};
 
 export 
 	STATUS_SUCCESS,
@@ -520,7 +521,7 @@ const STATUS_LAST_STATUS: int = 36;
 type status = int;
 
 fn status_to_str(status: status) -> str unsafe {
-	ret str::from_cstr(ccairo::cairo_status_to_string(status));
+	ret core::str::from_cstr(ccairo::cairo_status_to_string(status));
 }
 
 const FORMAT_INVALID: int = -1;
@@ -671,36 +672,36 @@ const FONT_TYPE_USER: int = 4;
 type font_type = int;
 
 type font_extents_record = {
-	ascent: f64,
-	descent: f64,
-	height: f64,
-	max_x_advance: f64,
-	max_y_advance: f64
+	mutable ascent: f64,
+	mutable descent: f64,
+	mutable height: f64,
+	mutable max_x_advance: f64,
+	mutable max_y_advance: f64
 };
 type text_extents_record = {
-	x_bearing: f64,
-	y_bearing: f64,
-	width: f64,
-	height: f64,
-	x_advance: f64,
-	y_advance: f64
+	mutable x_bearing: f64,
+	mutable y_bearing: f64,
+	mutable width: f64,
+	mutable height: f64,
+	mutable x_advance: f64,
+	mutable y_advance: f64
 };
 type matrix_record = {
-	xx: f64,
-	yx: f64,
-	xy: f64,
-	yy: f64,
-	x0: f64,
-	y0: f64
+	mutable xx: f64,
+	mutable yx: f64,
+	mutable xy: f64,
+	mutable yy: f64,
+	mutable x0: f64,
+	mutable y0: f64
 };
 type glyph_record = {
-	index: ctypes::ulong,
-	x: f64,
-	y: f64
+	mutable index: ctypes::ulong,
+	mutable x: f64,
+	mutable y: f64
 };
 type text_cluster_record = {
-	num_bytes: ctypes::c_int,
-	num_glyphs: ctypes::c_int
+	mutable num_bytes: ctypes::c_int,
+	mutable num_glyphs: ctypes::c_int
 };
 
 const DEVICE_TYPE_DRM: int = 0;
@@ -777,13 +778,13 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 	fn write_to_file(file: str) -> status unsafe { // TODO more image formats
 		let path = std::fs::make_absolute(file);
 		let split = std::fs::splitext(path);
-		let bytes = str::bytes(path);
+		let bytes = core::str::bytes(path);
 		
-		vec::push(bytes, 0 as u8);
+		core::vec::push(bytes, 0 as u8);
 		
 		alt split {
 			(base, ".png") {
-				ret ccairo::cairo_surface_write_to_png(internal, vec::unsafe::to_ptr(bytes)) as status;
+				ret ccairo::cairo_surface_write_to_png(internal, core::vec::unsafe::to_ptr(bytes)) as status;
 			}
 			(base, _) {
 				ret STATUS_WRITE_ERROR;
@@ -815,8 +816,8 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 	fn mark_dirty() {
 		ccairo::cairo_surface_mark_dirty(internal);
 	}
-	fn mark_dirty_rectangle(x: int, y: int, width: int, height: int) {
-		ccairo::cairo_surface_mark_dirty_rectangle(internal, x, y, width, height);
+	fn mark_dirty_rectangle(x: uint, y: uint, width: uint, height: uint) {
+		ccairo::cairo_surface_mark_dirty_rectangle(internal, x as ctypes::c_int, y as ctypes::c_int, width as ctypes::c_int, height as ctypes::c_int);
 	}
 	fn set_device_offset(x: float, y: float) {
 		ccairo::cairo_surface_set_device_offset(internal, x, y);
@@ -825,7 +826,7 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 		let x: f64 = 0.0;
 		let y: f64 = 0.0;
 		
-		ccairo::cairo_surface_get_device_offset(internal, ptr::addr_of(x), ptr::addr_of(y));
+		ccairo::cairo_surface_get_device_offset(internal, core::ptr::addr_of(x), core::ptr::addr_of(y));
 		
 		ret (x, y);
 	}
@@ -836,7 +837,7 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 		let x_ppi: f64 = 0.0;
 		let y_ppi: f64 = 0.0;
 		
-		ccairo::cairo_surface_get_fallback_resolution(internal, ptr::addr_of(x_ppi), ptr::addr_of(y_ppi));
+		ccairo::cairo_surface_get_fallback_resolution(internal, core::ptr::addr_of(x_ppi), core::ptr::addr_of(y_ppi));
 		
 		ret (x_ppi, y_ppi);
 	}
@@ -864,14 +865,14 @@ resource surface_res(internal: ctypes::intptr_t) {
 	ccairo::cairo_surface_destroy(internal);
 }
 
-fn mk_surface_from_similar(other: surface, content: content, width: int, height: int) -> surface unsafe {
-	let internal: ctypes::intptr_t = ccairo::cairo_surface_create_similar(other.get_internal(), content, width, height);
+fn mk_surface_from_similar(other: surface, content: content, width: uint, height: uint) -> surface unsafe {
+	let internal: ctypes::intptr_t = ccairo::cairo_surface_create_similar(other.get_internal(), content, width as ctypes::c_int, height as ctypes::c_int);
 	let res = @surface_res(internal);
 	
 	ret surface(internal, res);
 }
-fn mk_image_surface(format: format, width: int, height: int) -> surface {
-	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create(format, width, height);
+fn mk_image_surface(format: format, width: uint, height: uint) -> surface {
+	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create(format, width as ctypes::c_int, height as ctypes::c_int);
 	let res = @surface_res(internal);
 	
 	ret surface(internal, res);
@@ -880,14 +881,14 @@ fn mk_image_surface_from_file(file: str) -> surface unsafe {
 	// Only PNG TODO add libjpeg and others later on (because that would be a cool extended feature)
 	let path = std::fs::make_absolute(file);
 	let split = std::fs::splitext(path);
-	let bytes = str::bytes(path);
+	let bytes = core::str::bytes(path);
 	let internal: ctypes::intptr_t;
 	
-	vec::push(bytes, 0 as u8);
+	core::vec::push(bytes, 0 as u8);
 		
 	alt split {
 		(base, ".png") {
-			internal = ccairo::cairo_image_surface_create_from_png(vec::unsafe::to_ptr(bytes));
+			internal = ccairo::cairo_image_surface_create_from_png(core::vec::unsafe::to_ptr(bytes));
 		}
 		(base, _) {
 			fail;
@@ -898,8 +899,8 @@ fn mk_image_surface_from_file(file: str) -> surface unsafe {
 	
 	ret surface(internal, res);
 }
-fn mk_image_surface_from_data(data: [u8], format: format, width: int, height: int, stride: int) -> surface unsafe {
-	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create_for_data(vec::unsafe::to_ptr(data), format, width, height, stride);
+fn mk_image_surface_from_data(data: [u8], format: format, width: uint, height: uint, stride: uint) -> surface unsafe {
+	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create_for_data(core::vec::unsafe::to_ptr(data), format, width as ctypes::c_int, height as ctypes::c_int, stride as ctypes::c_int);
 	let res = @surface_res(internal);
 	
 	ret surface(internal, res);
@@ -921,18 +922,18 @@ obj pattern(internal: ctypes::intptr_t, res: @pattern_res) {
 	fn get_color_stop_count() -> int {
 		let count: ctypes::c_int = 0;
 		
-		ccairo::cairo_pattern_get_color_stop_count(internal, ptr::addr_of(count));
+		ccairo::cairo_pattern_get_color_stop_count(internal, core::ptr::addr_of(count));
 		
 		ret count;
 	}
-	fn get_color_stop(index: int) -> (float, float, float, float, float) {
+	fn get_color_stop(index: uint) -> (float, float, float, float, float) {
 		let offset: f64 = 0.0;
 		let red: f64 = 0.0;
 		let green: f64 = 0.0;
 		let blue: f64 = 0.0;
 		let alpha: f64 = 0.0;
 		
-		ccairo::cairo_pattern_get_color_stop_rgba(internal, index, ptr::addr_of(offset), ptr::addr_of(red), ptr::addr_of(green), ptr::addr_of(blue), ptr::addr_of(alpha));
+		ccairo::cairo_pattern_get_color_stop_rgba(internal, index as ctypes::c_int, core::ptr::addr_of(offset), core::ptr::addr_of(red), core::ptr::addr_of(green), core::ptr::addr_of(blue), core::ptr::addr_of(alpha));
 		
 		ret (offset, red, green, blue, alpha);
 	}
@@ -942,14 +943,14 @@ obj pattern(internal: ctypes::intptr_t, res: @pattern_res) {
 		let blue: f64 = 0.0;
 		let alpha: f64 = 0.0;
 		
-		ccairo::cairo_pattern_get_rgba(internal, ptr::addr_of(red), ptr::addr_of(green), ptr::addr_of(blue), ptr::addr_of(alpha));
+		ccairo::cairo_pattern_get_rgba(internal, core::ptr::addr_of(red), core::ptr::addr_of(green), core::ptr::addr_of(blue), core::ptr::addr_of(alpha));
 		
 		ret (red, green, blue, alpha);
 	}
 	fn get_surface() -> surface {
 		let other_internal: ctypes::intptr_t = 0 as ctypes::intptr_t;
 		
-		ccairo::cairo_pattern_get_surface(internal, ptr::addr_of(other_internal));
+		ccairo::cairo_pattern_get_surface(internal, core::ptr::addr_of(other_internal));
 		
 		let other_res = @surface_res(other_internal);
 	
@@ -961,7 +962,7 @@ obj pattern(internal: ctypes::intptr_t, res: @pattern_res) {
 		let x1: f64 = 0.0;
 		let y1: f64 = 0.0;
 		
-		ccairo::cairo_pattern_get_linear_points(internal, ptr::addr_of(x0), ptr::addr_of(y0), ptr::addr_of(x1), ptr::addr_of(y1));
+		ccairo::cairo_pattern_get_linear_points(internal, core::ptr::addr_of(x0), core::ptr::addr_of(y0), core::ptr::addr_of(x1), core::ptr::addr_of(y1));
 			
 		ret (x0, y0, x1, y1);
 	}
@@ -973,7 +974,7 @@ obj pattern(internal: ctypes::intptr_t, res: @pattern_res) {
 		let y1: f64 = 0.0;
 		let r1: f64 = 0.0;
 		
-		ccairo::cairo_pattern_get_radial_circles(internal, ptr::addr_of(x0), ptr::addr_of(y0), ptr::addr_of(r0), ptr::addr_of(x1), ptr::addr_of(y1), ptr::addr_of(r1));
+		ccairo::cairo_pattern_get_radial_circles(internal, core::ptr::addr_of(x0), core::ptr::addr_of(y0), core::ptr::addr_of(r0), core::ptr::addr_of(x1), core::ptr::addr_of(y1), core::ptr::addr_of(r1));
 			
 		ret (x0, y0, r0, x1, y1, r1);
 	}
@@ -1111,7 +1112,7 @@ obj matrix(internal: ctypes::intptr_t, res: @matrix_res) {
 		let xt: f64 = x;
 		let yt: f64 = y;
 		
-		ccairo::cairo_matrix_transform_distance(internal, ptr::addr_of(xt), ptr::addr_of(yt));
+		ccairo::cairo_matrix_transform_distance(internal, core::ptr::addr_of(xt), core::ptr::addr_of(yt));
 		
 		ret (xt, yt);
 	}
@@ -1119,7 +1120,7 @@ obj matrix(internal: ctypes::intptr_t, res: @matrix_res) {
 		let xt: f64 = x;
 		let yt: f64 = y;
 		
-		ccairo::cairo_matrix_transform_point(internal, ptr::addr_of(xt), ptr::addr_of(yt));
+		ccairo::cairo_matrix_transform_point(internal, core::ptr::addr_of(xt), core::ptr::addr_of(yt));
 		
 		ret (xt, yt);
 	}
@@ -1131,14 +1132,14 @@ resource matrix_res(internal: ctypes::intptr_t) {
 
 fn mk_matrix(values: [float]) -> matrix {
 	let record: matrix_record = {
-		xx: 0.0,
-		yx: 0.0,
-		xy: 0.0,
-		yy: 0.0,
-		x0: 0.0,
-		y0: 0.0
+		mutable xx: 0.0,
+		mutable yx: 0.0,
+		mutable xy: 0.0,
+		mutable yy: 0.0,
+		mutable x0: 0.0,
+		mutable y0: 0.0
 	};
-	let internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+	let internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 	let res = @matrix_res(internal);
 	let result: matrix = matrix(internal, res);
 	
@@ -1170,6 +1171,15 @@ resource path_res(internal: ctypes::intptr_t) {
 obj glyph(internal: ctypes::intptr_t, res: @glyph_res) {
 	// General
 	
+	fn set_index(index: uint) {
+		self.get_record().index = index as ctypes::ulong;
+	}
+	fn set_x(x: float) {
+		self.get_record().x = x as float;
+	}
+	fn set_y(y: float) {
+		self.get_record().y = y as float;
+	}
 	fn get_index() -> uint {
 		ret self.get_record().index;
 	}
@@ -1196,11 +1206,11 @@ resource glyph_res(internal: ctypes::intptr_t) {
 
 fn mk_glyph(index: uint, x: float, y: float) -> glyph {
 	let record: glyph_record = {
-		index: index,
-		x: x,
-		y: y
+		mutable index: index,
+		mutable x: x,
+		mutable y: y
 	};
-	let internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+	let internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 	let res = @glyph_res(internal);
 	
 	ret glyph(internal, res);
@@ -1209,11 +1219,17 @@ fn mk_glyph(index: uint, x: float, y: float) -> glyph {
 obj text_cluster(internal: ctypes::intptr_t, res: @text_cluster_res) {
 	// General
 	
-	fn get_num_bytes() -> int {
-		ret self.get_record().num_bytes;
+	fn set_num_bytes(num_bytes: uint) {
+		self.get_record().num_bytes = num_bytes as ctypes::c_int;
 	}
-	fn get_num_glyphs() -> int {
-		ret self.get_record().num_glyphs;
+	fn set_num_glyphs(num_glyphs: uint) {
+		self.get_record().num_glyphs = num_glyphs as ctypes::c_int;
+	}
+	fn get_num_bytes() -> uint {
+		ret self.get_record().num_bytes as uint;
+	}
+	fn get_num_glyphs() -> uint {
+		ret self.get_record().num_glyphs as uint;
 	}
 
 	// Misc
@@ -1230,12 +1246,12 @@ resource text_cluster_res(internal: ctypes::intptr_t) {
 	internal;
 }
 
-fn mk_text_cluster(num_bytes: int, num_glyphs: int) -> text_cluster {
+fn mk_text_cluster(num_bytes: uint, num_glyphs: uint) -> text_cluster {
 	let record: text_cluster_record = {
-		num_bytes: num_bytes,
-		num_glyphs: num_glyphs
+		mutable num_bytes: num_bytes as ctypes::c_int,
+		mutable num_glyphs: num_glyphs as ctypes::c_int
 	};
-	let internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+	let internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 	let res = @text_cluster_res(internal);
 	
 	ret text_cluster(internal, res);
@@ -1326,7 +1342,7 @@ obj font_face(internal: ctypes::intptr_t, res: @font_face_res) {
 		ret ccairo::cairo_toy_font_face_get_weight(internal) as font_weight;
 	}
 	fn get_toy_family() -> str unsafe {
-		ret str::from_cstr(ccairo::cairo_toy_font_face_get_family(internal));
+		ret core::str::from_cstr(ccairo::cairo_toy_font_face_get_family(internal));
 	}
 	
 	// Misc
@@ -1341,11 +1357,11 @@ resource font_face_res(internal: ctypes::intptr_t) {
 }
 
 fn mk_font_face_from_toy_font(family: str, slant: font_slant, weight: font_weight) -> font_face unsafe {
-	let bytes = str::bytes(family);
+	let bytes = core::str::bytes(family);
 	
-	vec::push(bytes, 0 as u8);
+	core::vec::push(bytes, 0 as u8);
 	
-	let internal: ctypes::intptr_t = ccairo::cairo_toy_font_face_create(vec::unsafe::to_ptr(bytes), slant, weight);
+	let internal: ctypes::intptr_t = ccairo::cairo_toy_font_face_create(core::vec::unsafe::to_ptr(bytes), slant, weight);
 	let res = @font_face_res(internal);
 	
 	ret font_face(internal, res);
@@ -1361,13 +1377,13 @@ obj scaled_font(internal: ctypes::intptr_t, res: @scaled_font_res) {
 	}
 	fn extents() -> font_extents {
 		let record: font_extents_record = {
-			ascent: 0.0,
-			descent: 0.0,
-			height: 0.0,
-			max_x_advance: 0.0,
-			max_y_advance: 0.0
+			mutable ascent: 0.0,
+			mutable descent: 0.0,
+			mutable height: 0.0,
+			mutable max_x_advance: 0.0,
+			mutable max_y_advance: 0.0
 		};
-		let other_internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+		let other_internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 		let other_res = @font_extents_res(other_internal);
 		
 		ccairo::cairo_scaled_font_extents(internal, other_internal);
@@ -1375,34 +1391,34 @@ obj scaled_font(internal: ctypes::intptr_t, res: @scaled_font_res) {
 		ret font_extents(other_internal, other_res);
 	}
 	fn text_extents(text: str) -> text_extents unsafe {
-		let bytes = str::bytes(text);
+		let bytes = core::str::bytes(text);
 		let record: text_extents_record = {
-			x_bearing: 0.0,
-			y_bearing: 0.0,
-			width: 0.0,
-			height: 0.0,
-			x_advance: 0.0,
-			y_advance: 0.0
+			mutable x_bearing: 0.0,
+			mutable y_bearing: 0.0,
+			mutable width: 0.0,
+			mutable height: 0.0,
+			mutable x_advance: 0.0,
+			mutable y_advance: 0.0
 		};
-		let other_internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+		let other_internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 		let other_res = @text_extents_res(other_internal);
 		
-		vec::push(bytes, 0 as u8);
+		core::vec::push(bytes, 0 as u8);
 		
-		ccairo::cairo_scaled_font_text_extents(internal, vec::unsafe::to_ptr(bytes), other_internal);
+		ccairo::cairo_scaled_font_text_extents(internal, core::vec::unsafe::to_ptr(bytes), other_internal);
 		
 		ret text_extents(other_internal, other_res);
 	}
 	fn glyph_extents(glyphs: [glyph]) -> text_extents unsafe {
 		let record: text_extents_record = {
-			x_bearing: 0.0,
-			y_bearing: 0.0,
-			width: 0.0,
-			height: 0.0,
-			x_advance: 0.0,
-			y_advance: 0.0
+			mutable x_bearing: 0.0,
+			mutable y_bearing: 0.0,
+			mutable width: 0.0,
+			mutable height: 0.0,
+			mutable x_advance: 0.0,
+			mutable y_advance: 0.0
 		};
-		let other_internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+		let other_internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 		let other_res = @text_extents_res(other_internal);
 		let cglyphs: [ctypes::intptr_t] = [];
 		
@@ -1410,7 +1426,7 @@ obj scaled_font(internal: ctypes::intptr_t, res: @scaled_font_res) {
 			cglyphs += [glyph.get_internal()];
 		}
 		
-		ccairo::cairo_scaled_font_glyph_extents(internal, vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, vec::len(cglyphs) as ctypes::c_int, other_internal);
+		ccairo::cairo_scaled_font_glyph_extents(internal, core::vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, core::vec::len(cglyphs) as ctypes::c_int, other_internal);
 		
 		ret text_extents(other_internal, other_res);
 	}
@@ -1605,7 +1621,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret ccairo::cairo_get_antialias(internal) as antialias;
 	}
 	fn set_dash(dashes: [float], offset: float) unsafe {
-		ccairo::cairo_set_dash(internal, vec::unsafe::to_ptr(dashes), vec::len(dashes) as ctypes::c_int, offset);
+		ccairo::cairo_set_dash(internal, core::vec::unsafe::to_ptr(dashes), core::vec::len(dashes) as ctypes::c_int, offset);
 	}
 	fn get_dash_count() -> int {
 		ret ccairo::cairo_get_dash_count(internal);
@@ -1613,14 +1629,14 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 	fn get_dash() -> [float] unsafe {
 		let dashes: [f64] = [];
 		
-		ccairo::cairo_get_dash(internal, vec::unsafe::to_ptr(dashes), ptr::null());
+		ccairo::cairo_get_dash(internal, core::vec::unsafe::to_ptr(dashes), core::ptr::null());
 		
 		ret dashes;
 	}
 	fn get_dash_offset() -> float {
 		let offset: f64 = 0.0;
 		
-		ccairo::cairo_get_dash(internal, ptr::null(), ptr::addr_of(offset));
+		ccairo::cairo_get_dash(internal, core::ptr::null(), core::ptr::addr_of(offset));
 		
 		ret offset;
 	}
@@ -1678,7 +1694,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let x2: f64 = 0.0;
 		let y2: f64 = 0.0;
 		
-		ccairo::cairo_clip_extents(internal, ptr::addr_of(x1), ptr::addr_of(y1), ptr::addr_of(x2), ptr::addr_of(y2));
+		ccairo::cairo_clip_extents(internal, core::ptr::addr_of(x1), core::ptr::addr_of(y1), core::ptr::addr_of(x2), core::ptr::addr_of(y2));
 		
 		ret (x1, y1, x2, y2);
 	}
@@ -1700,7 +1716,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let x2: f64 = 0.0;
 		let y2: f64 = 0.0;
 		
-		ccairo::cairo_fill_extents(internal, ptr::addr_of(x1), ptr::addr_of(y1), ptr::addr_of(x2), ptr::addr_of(y2));
+		ccairo::cairo_fill_extents(internal, core::ptr::addr_of(x1), core::ptr::addr_of(y1), core::ptr::addr_of(x2), core::ptr::addr_of(y2));
 		
 		ret (x1, y1, x2, y2);
 	}
@@ -1731,7 +1747,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let x2: f64 = 0.0;
 		let y2: f64 = 0.0;
 		
-		ccairo::cairo_stroke_extents(internal, ptr::addr_of(x1), ptr::addr_of(y1), ptr::addr_of(x2), ptr::addr_of(y2));
+		ccairo::cairo_stroke_extents(internal, core::ptr::addr_of(x1), core::ptr::addr_of(y1), core::ptr::addr_of(x2), core::ptr::addr_of(y2));
 		
 		ret (x1, y1, x2, y2);
 	}
@@ -1769,7 +1785,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let x: f64 = 0.0;
 		let y: f64 = 0.0;
 		
-		ccairo::cairo_get_current_point(internal, ptr::addr_of(x), ptr::addr_of(y));
+		ccairo::cairo_get_current_point(internal, core::ptr::addr_of(x), core::ptr::addr_of(y));
 		
 		ret (x, y);
 	}
@@ -1807,14 +1823,14 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 			cglyphs += [glyph.get_internal()];
 		}
 		
-		ccairo::cairo_glyph_path(internal, vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, vec::len(cglyphs) as ctypes::c_int);
+		ccairo::cairo_glyph_path(internal, core::vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, core::vec::len(cglyphs) as ctypes::c_int);
 	}
 	fn text_path(text: str) unsafe {
-		let bytes = str::bytes(text);
+		let bytes = core::str::bytes(text);
 		
-		vec::push(bytes, 0 as u8);
+		core::vec::push(bytes, 0 as u8);
 		
-		ccairo::cairo_text_path(internal, vec::unsafe::to_ptr(bytes));
+		ccairo::cairo_text_path(internal, core::vec::unsafe::to_ptr(bytes));
 	}
 	fn rel_curve_to(x1: float, y1: float, x2: float, y2: float, x3: float, y3: float) {
 		ccairo::cairo_rel_curve_to(internal, x1, y1, x2, y2, x3, y3);
@@ -1831,7 +1847,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let x2: f64 = 0.0;
 		let y2: f64 = 0.0;
 		
-		ccairo::cairo_path_extents(internal, ptr::addr_of(x1), ptr::addr_of(y1), ptr::addr_of(x2), ptr::addr_of(y2));
+		ccairo::cairo_path_extents(internal, core::ptr::addr_of(x1), core::ptr::addr_of(y1), core::ptr::addr_of(x2), core::ptr::addr_of(y2));
 		
 		ret (x1, y1, x2, y2);
 	}
@@ -1866,7 +1882,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let xt: f64 = x;
 		let yt: f64 = y;
 		
-		ccairo::cairo_user_to_device(internal, ptr::addr_of(x), ptr::addr_of(y));
+		ccairo::cairo_user_to_device(internal, core::ptr::addr_of(x), core::ptr::addr_of(y));
 		
 		ret (xt, yt);
 	}
@@ -1874,7 +1890,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let xt: f64 = x;
 		let yt: f64 = y;
 		
-		ccairo::cairo_user_to_device_distance(internal, ptr::addr_of(x), ptr::addr_of(y));
+		ccairo::cairo_user_to_device_distance(internal, core::ptr::addr_of(x), core::ptr::addr_of(y));
 		
 		ret (xt, yt);
 	}
@@ -1882,7 +1898,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let xt: f64 = x;
 		let yt: f64 = y;
 		
-		ccairo::cairo_device_to_user(internal, ptr::addr_of(x), ptr::addr_of(y));
+		ccairo::cairo_device_to_user(internal, core::ptr::addr_of(x), core::ptr::addr_of(y));
 		
 		ret (xt, yt);
 	}
@@ -1890,7 +1906,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		let xt: f64 = x;
 		let yt: f64 = y;
 		
-		ccairo::cairo_device_to_user_distance(internal, ptr::addr_of(x), ptr::addr_of(y));
+		ccairo::cairo_device_to_user_distance(internal, core::ptr::addr_of(x), core::ptr::addr_of(y));
 		
 		ret (xt, yt);
 	}
@@ -1898,11 +1914,11 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 	// Text
 	
 	fn select_font_face(face: str, slant: font_slant, weight: font_weight) unsafe {
-		let bytes = str::bytes(face);
+		let bytes = core::str::bytes(face);
 		
-		vec::push(bytes, 0 as u8);
+		core::vec::push(bytes, 0 as u8);
 		
-		ccairo::cairo_select_font_face(internal, vec::unsafe::to_ptr(bytes), slant, weight);
+		ccairo::cairo_select_font_face(internal, core::vec::unsafe::to_ptr(bytes), slant, weight);
 	}
 	fn set_font_size(size: float) {
 		ccairo::cairo_set_font_size(internal, size);
@@ -1912,14 +1928,14 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 	}
 	fn get_font_matrix() -> matrix {
 		let record: matrix_record = {
-			xx: 0.0,
-			yx: 0.0,
-			xy: 0.0,
-			yy: 0.0,
-			x0: 0.0,
-			y0: 0.0
+			mutable xx: 0.0,
+			mutable yx: 0.0,
+			mutable xy: 0.0,
+			mutable yy: 0.0,
+			mutable x0: 0.0,
+			mutable y0: 0.0
 		};
-		let other_internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+		let other_internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 		let other_res = @matrix_res(other_internal);
 		
 		ccairo::cairo_get_font_matrix(internal, other_internal);
@@ -1956,11 +1972,11 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret scaled_font(other_internal, other_res);
 	}
 	fn show_text(text: str) unsafe {
-		let bytes = str::bytes(text);
+		let bytes = core::str::bytes(text);
 		
-		vec::push(bytes, 0 as u8);
+		core::vec::push(bytes, 0 as u8);
 		
-		ccairo::cairo_show_text(internal, vec::unsafe::to_ptr(bytes));
+		ccairo::cairo_show_text(internal, core::vec::unsafe::to_ptr(bytes));
 	}
 	fn show_glyphs (glyphs: [glyph]) unsafe {
 		let cglyphs: [ctypes::intptr_t] = [];
@@ -1969,14 +1985,14 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 			cglyphs += [glyph.get_internal()];
 		}
 		
-		ccairo::cairo_show_glyphs(internal, vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, vec::len(cglyphs) as ctypes::c_int);
+		ccairo::cairo_show_glyphs(internal, core::vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, core::vec::len(cglyphs) as ctypes::c_int);
 	}
 	fn show_text_glyphs(text: str, glyphs: [glyph], clusters: [text_cluster], cluster_flags: text_cluster_flags) unsafe {
 		let cglyphs: [ctypes::intptr_t] = [];
 		let cclusters: [ctypes::intptr_t] = [];
-		let bytes = str::bytes(text);
+		let bytes = core::str::bytes(text);
 		
-		vec::push(bytes, 0 as u8);
+		core::vec::push(bytes, 0 as u8);
 		
 		for glyph in glyphs {
 			cglyphs += [glyph.get_internal()];
@@ -1985,17 +2001,17 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 			cclusters += [cluster.get_internal()];
 		}
 		
-		ccairo::cairo_show_text_glyphs(internal, vec::unsafe::to_ptr(bytes), vec::len(bytes) as ctypes::c_int, vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, vec::len(cglyphs) as ctypes::c_int, vec::unsafe::to_ptr(cclusters) as ctypes::intptr_t, vec::len(cclusters) as ctypes::c_int, cluster_flags);
+		ccairo::cairo_show_text_glyphs(internal, core::vec::unsafe::to_ptr(bytes), core::vec::len(bytes) as ctypes::c_int, core::vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, core::vec::len(cglyphs) as ctypes::c_int, core::vec::unsafe::to_ptr(cclusters) as ctypes::intptr_t, core::vec::len(cclusters) as ctypes::c_int, cluster_flags);
 	}
 	fn font_extents() -> font_extents {
 		let record: font_extents_record = {
-			ascent: 0.0,
-			descent: 0.0,
-			height: 0.0,
-			max_x_advance: 0.0,
-			max_y_advance: 0.0
+			mutable ascent: 0.0,
+			mutable descent: 0.0,
+			mutable height: 0.0,
+			mutable max_x_advance: 0.0,
+			mutable max_y_advance: 0.0
 		};
-		let other_internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+		let other_internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 		let other_res = @font_extents_res(other_internal);
 		
 		ccairo::cairo_font_extents(internal, other_internal);
@@ -2003,33 +2019,33 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret font_extents(other_internal, other_res);
 	}
 	fn text_extents(text: str) -> text_extents unsafe {
-		let bytes = str::bytes(text);
+		let bytes = core::str::bytes(text);
 		let record: text_extents_record = {
-			x_bearing: 0.0,
-			y_bearing: 0.0,
-			width: 0.0,
-			height: 0.0,
-			x_advance: 0.0,
-			y_advance: 0.0
+			mutable x_bearing: 0.0,
+			mutable y_bearing: 0.0,
+			mutable width: 0.0,
+			mutable height: 0.0,
+			mutable x_advance: 0.0,
+			mutable y_advance: 0.0
 		};
-		let other_internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+		let other_internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 		let other_res = @text_extents_res(other_internal);
 		
-		vec::push(bytes, 0 as u8);
-		ccairo::cairo_text_extents(internal, vec::unsafe::to_ptr(bytes), other_internal);
+		core::vec::push(bytes, 0 as u8);
+		ccairo::cairo_text_extents(internal, core::vec::unsafe::to_ptr(bytes), other_internal);
 		
 		ret text_extents(other_internal, other_res);
 	}
 	fn glyph_extents(glyphs: [glyph]) -> text_extents unsafe {
 		let record: text_extents_record = {
-			x_bearing: 0.0,
-			y_bearing: 0.0,
-			width: 0.0,
-			height: 0.0,
-			x_advance: 0.0,
-			y_advance: 0.0
+			mutable x_bearing: 0.0,
+			mutable y_bearing: 0.0,
+			mutable width: 0.0,
+			mutable height: 0.0,
+			mutable x_advance: 0.0,
+			mutable y_advance: 0.0
 		};
-		let other_internal: ctypes::intptr_t = ptr::addr_of(record) as ctypes::intptr_t;
+		let other_internal: ctypes::intptr_t = core::ptr::addr_of(record) as ctypes::intptr_t;
 		let other_res = @text_extents_res(other_internal);
 		let cglyphs: [ctypes::intptr_t] = [];
 		
@@ -2037,7 +2053,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 			cglyphs += [glyph.get_internal()];
 		}
 		
-		ccairo::cairo_glyph_extents(internal, vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, vec::len(cglyphs) as ctypes::c_int, other_internal);
+		ccairo::cairo_glyph_extents(internal, core::vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, core::vec::len(cglyphs) as ctypes::c_int, other_internal);
 		
 		ret text_extents(other_internal, other_res);
 	}
