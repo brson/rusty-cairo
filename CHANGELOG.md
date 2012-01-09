@@ -1,6 +1,7 @@
 ## v0.1.2
 
 * Added freetype support (mk_font_face_from_file("../some/font.ttf")) (will add more backends later, quartz, win32, etc.)
+* Added mk_pdf_surface and mk_svg_surface. Currently it requires the output file name as the first argument for the constructors. In the future it will be changed so you can use write_to_file and if it was a specially made svg or pdf surface and it has a .svg/.pdf extension, it would save it.
 
 ## v0.1.1
 
