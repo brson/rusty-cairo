@@ -240,6 +240,7 @@ export
 
 	font_face,
 	mk_font_face_from_toy_font,
+	mk_font_face_from_file,
 
 	scaled_font,
 
@@ -255,8 +256,18 @@ export
  * recreating new objects every time for each internal cairo pointer
 */
 
+#[link_name = "freetype"]
+native mod cft {
+	fn FT_Init_FreeType(library: *ctypes::intptr_t) -> ctypes::c_int;
+	fn FT_New_Face(library: ctypes::intptr_t, path: *u8, offset: ctypes::long, face: *ctypes::intptr_t) -> ctypes::c_int;
+	fn FT_Done_Face(face: ctypes::intptr_t);
+}
+
 #[link_name = "cairo"]
 native mod ccairo {
+	fn cairo_ft_font_face_create_for_ft_face(ft_face: ctypes::intptr_t, flags: ctypes::c_int) -> ctypes::intptr_t;
+	fn cairo_font_face_set_user_data(face: ctypes::intptr_t, key: ctypes::intptr_t, ft_face: ctypes::intptr_t, cb: ctypes::intptr_t);	
+
 	fn cairo_create(surface: ctypes::intptr_t) -> ctypes::intptr_t;
 	fn cairo_reference(context: ctypes::intptr_t) -> ctypes::intptr_t;
 	fn cairo_destroy(context: ctypes::intptr_t);
@@ -975,7 +986,7 @@ fn mk_image_surface_from_data(data: [u8], format: format, width: uint, height: u
  */
 
 obj pattern(internal: ctypes::intptr_t, res: @pattern_res) {
-	// General TODO
+	// General
 	
 	fn add_color_stop_rgb(offset: float, red: float, green: float, blue: float) {
 		ccairo::cairo_pattern_add_color_stop_rgb(internal, offset, red, green, blue);
@@ -1393,7 +1404,7 @@ resource text_extents_res(internal: ctypes::intptr_t) {
 	internal;
 }
 
-obj font_face(internal: ctypes::intptr_t, res: @font_face_res) {
+obj font_face(internal: ctypes::intptr_t, res: @font_face_res, backend_res: @font_face_backend_res) {
 	// General
 	
 	fn get_status() -> status {
@@ -1422,6 +1433,9 @@ obj font_face(internal: ctypes::intptr_t, res: @font_face_res) {
 resource font_face_res(internal: ctypes::intptr_t) {
 	ccairo::cairo_font_face_destroy(internal);
 }
+resource font_face_backend_res(backend_internal: ctypes::intptr_t) {
+	cft::FT_Done_Face(backend_internal);
+}
 
 fn mk_font_face_from_toy_font(family: str, slant: font_slant, weight: font_weight) -> font_face unsafe {
 	let bytes = core::str::bytes(family);
@@ -1430,11 +1444,46 @@ fn mk_font_face_from_toy_font(family: str, slant: font_slant, weight: font_weigh
 	
 	let internal: ctypes::intptr_t = ccairo::cairo_toy_font_face_create(core::vec::unsafe::to_ptr(bytes), slant, weight);
 	let res = @font_face_res(internal);
+	let backend_res = @font_face_backend_res(0 as ctypes::intptr_t);
 	
-	ret font_face(internal, res);
+	ret font_face(internal, res, backend_res);
 }
 
-// TODO mk_font_face_from_file
+fn mk_font_face_from_file(file: str) -> font_face unsafe {
+	let path = std::fs::make_absolute(file);
+	let split = std::fs::splitext(path);
+	let bytes = core::str::bytes(path);
+	let internal: ctypes::intptr_t;
+	let backend_internal: ctypes::intptr_t = 0 as ctypes::intptr_t;
+	
+	core::vec::push(bytes, 0 as u8);
+		
+	alt split {
+		(base, ".ttf") {
+			let face_internal: ctypes::intptr_t = 0 as ctypes::intptr_t;
+			let library_internal: ctypes::intptr_t = 0 as ctypes::intptr_t;
+
+			if cft::FT_Init_FreeType(core::ptr::addr_of(library_internal)) != 0 {
+				fail;
+			}
+
+			if cft::FT_New_Face(library_internal, core::vec::unsafe::to_ptr(bytes), 0, core::ptr::addr_of(face_internal)) != 0{
+				fail;
+			}
+			
+			backend_internal = face_internal;
+			internal = ccairo::cairo_ft_font_face_create_for_ft_face(face_internal, 0);
+		}
+		(base, _) {
+			fail;
+		}
+	}
+	
+	let res = @font_face_res(internal);
+	let backend_res = @font_face_backend_res(backend_internal);
+	
+	ret font_face(internal, res, backend_res);
+}
 
 obj scaled_font(internal: ctypes::intptr_t, res: @scaled_font_res) {
 	// General
@@ -1500,8 +1549,9 @@ obj scaled_font(internal: ctypes::intptr_t, res: @scaled_font_res) {
 	fn get_font_face() -> font_face {
 		let other_internal: ctypes::intptr_t = ccairo::cairo_font_face_reference(ccairo::cairo_scaled_font_get_font_face(internal));
 		let other_res = @font_face_res(other_internal);
+		let backend_res = @font_face_backend_res(0 as ctypes::intptr_t);
 		
-		ret font_face(other_internal, other_res);
+		ret font_face(other_internal, other_res, backend_res);
 	}
 	fn get_font_options() -> font_options {
 		let options: font_options = mk_font_options();
@@ -2026,8 +2076,9 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 	fn get_font_face() -> font_face {
 		let other_internal: ctypes::intptr_t = ccairo::cairo_font_face_reference(ccairo::cairo_get_font_face(internal));
 		let other_res = @font_face_res(other_internal);
+		let backend_res = @font_face_backend_res(0 as ctypes::intptr_t);
 	
-		ret font_face(other_internal, other_res);
+		ret font_face(other_internal, other_res, backend_res);
 	}
 	fn set_scaled_font(font: scaled_font) {
 		ccairo::cairo_set_scaled_font(internal, font.get_internal());

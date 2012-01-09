@@ -8,6 +8,7 @@ You will need the following before you can use this:
 
 * The Rust compiler built and installed on your system.
 * The cairo libraries installed on your system. On Unix systems, this should be available in a package on your system's package manager under something like libcairo-dev or you can build it from source via the GNU build system and install it. On Windows, you will need to either build the cairo library as a DLL and then include it with your Rust project's build, or install the GTK+ runtime which will put the cairo DLL in your system's library search path.
+* FreeType, same deal as above.
 
 ## Download
 

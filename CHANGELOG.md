@@ -1,3 +1,7 @@
+## v0.1.2
+
+* Added freetype support (mk_font_face_from_file("../some/font.ttf")) (will add more backends later, quartz, win32, etc.)
+
 ## v0.1.1
 
 * Added export statement so internal functions don't get exported.

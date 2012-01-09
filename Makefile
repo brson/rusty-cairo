@@ -6,12 +6,14 @@ test: all
 	rustc --test -L ./lib ./test/rounded-rectangle-stroke.rs -o ./test/rounded-rectangle-stroke.elf
 	rustc --test -L ./lib ./test/toy-font-face.rs -o ./test/toy-font-face.elf
 	rustc --test -L ./lib ./test/shape-sierpinski.rs -o ./test/shape-sierpinski.elf
+	rustc --test -L ./lib ./test/ft-font-face.rs -o ./test/ft-font-face.elf
 	cd test \
 	&& ./a1-bug.elf \
 	&& ./rounded-rectangle-fill.elf \
 	&& ./rounded-rectangle-stroke.elf \
 	&& ./toy-font-face.elf \
 	&& ./shape-sierpinski.elf \
+	&& ./ft-font-face.elf \
 	&& cd ..
 clean:
 	rm -R -f ./lib/*
