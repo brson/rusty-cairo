@@ -469,6 +469,14 @@ native mod ccairo {
 	fn cairo_surface_status(surface: ctypes::intptr_t) -> ctypes::c_int;
 	fn cairo_surface_flush(surface: ctypes::intptr_t);
 	fn cairo_surface_reference(surface: ctypes::intptr_t) -> ctypes::intptr_t;
+	fn cairo_image_surface_get_data(surface: ctypes::intptr_t) -> *u8;
+	fn cairo_image_surface_get_format(surface: ctypes::intptr_t) -> ctypes::c_int;
+	fn cairo_image_surface_get_height(surface: ctypes::intptr_t) -> ctypes::c_int;
+	fn cairo_image_surface_get_width(surface: ctypes::intptr_t) -> ctypes::c_int;
+	fn cairo_image_surface_get_stride(surface: ctypes::intptr_t) -> ctypes::c_int;
+	fn cairo_pdf_surface_restrict_to_version(surface: ctypes::intptr_t, version: ctypes::c_int);
+	fn cairo_svg_surface_restrict_to_version(surface: ctypes::intptr_t, version: ctypes::c_int);
+	fn cairo_pdf_surface_set_size(surface: ctypes::intptr_t, width: f64, height: f64);
 	
 	fn cairo_device_reference(device: ctypes::intptr_t) -> ctypes::intptr_t;
 	fn cairo_device_destroy(device: ctypes::intptr_t);
@@ -773,6 +781,52 @@ resource device_res(internal: ctypes::intptr_t) {
  */
 
 obj surface(internal: ctypes::intptr_t, res: @surface_res) {
+	// Special surfaces
+	
+	fn restrict_to_pdf_version(version: str) {
+		alt version {
+			"1.4" {
+				ccairo::cairo_pdf_surface_restrict_to_version(internal, 0);
+			}
+			"1.5" {
+				ccairo::cairo_pdf_surface_restrict_to_version(internal, 1);
+			}
+		}
+	}
+	fn set_pdf_size(width_in_points: float, height_in_points: float) {
+		ccairo::cairo_pdf_surface_set_size(internal, width_in_points, height_in_points);
+	}
+	fn restrict_to_svg_version(version: str) {
+		alt version {
+			"1.1" {
+				ccairo::cairo_svg_surface_restrict_to_version(internal, 0);
+			}
+			"1.2" {
+				ccairo::cairo_svg_surface_restrict_to_version(internal, 1);
+			}
+		}
+	}
+	fn get_image_data() -> [mutable u8] unsafe { // TODO test if this is mutable, as rust might not keep the same pointers but reallocate
+		let data = ccairo::cairo_image_surface_get_data(internal);
+		
+		ret core::vec::to_mut(core::vec::unsafe::from_buf(data, self.get_image_stride() * self.get_image_height()));
+	}
+	fn get_image_format() -> format {
+		ret ccairo::cairo_image_surface_get_format(internal) as format;
+	}
+	fn get_image_width() -> uint {
+		ret ccairo::cairo_image_surface_get_width(internal) as uint;
+	}
+	fn get_image_height() -> uint {
+		ret ccairo::cairo_image_surface_get_height(internal) as uint;
+	}
+	fn get_image_stride() -> uint {
+		ret ccairo::cairo_image_surface_get_stride(internal) as uint;
+	}
+	fn get_image_size() -> (uint, uint) {
+		ret (self.get_image_width(), self.get_image_height());
+	}
+	
 	// General
 
 	fn write_to_file(file: str) -> status unsafe { // TODO more image formats
@@ -785,6 +839,12 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 		alt split {
 			(base, ".png") {
 				ret ccairo::cairo_surface_write_to_png(internal, core::vec::unsafe::to_ptr(bytes)) as status;
+			}
+			(base, ".svg") { //TODO
+				ret STATUS_WRITE_ERROR;
+			}
+			(base, ".pdf") { //TODO
+				ret STATUS_WRITE_ERROR;
 			}
 			(base, _) {
 				ret STATUS_WRITE_ERROR;
@@ -893,6 +953,10 @@ fn mk_image_surface_from_file(file: str) -> surface unsafe {
 		(base, _) {
 			fail;
 		}
+	}
+	
+	if ccairo::cairo_surface_status(internal) as status != STATUS_SUCCESS {
+		fail;
 	}
 
 	let res = @surface_res(internal);
@@ -1313,6 +1377,9 @@ obj text_extents(internal: ctypes::intptr_t, res: @text_extents_res) {
 	}
 	fn get_height() -> float {
 		ret self.get_record().height;
+	}
+	fn get_size() -> (float, float) {
+		ret (self.get_width(), self.get_height());
 	}
 	fn get_x_advance() -> float {
 		ret self.get_record().x_advance;
