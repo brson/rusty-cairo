@@ -1,4 +1,4 @@
-#[link(name = "cairo", vers = "0.1.1pre", author = "Zack0Wack0")];
+#[link(name = "cairo", vers = "0.1.1", author = "Zack0Wack0")];
 #[crate_type = "lib"];
 
 use std;
