@@ -2,7 +2,7 @@
 #[crate_type = "lib"];
 
 use std;
-import std::{fs};
+import std::{fs, tempfile};
 import core::{ptr, vec, str};
 
 export 
@@ -216,6 +216,8 @@ export
 	mk_image_surface,
 	mk_image_surface_from_file,
 	mk_image_surface_from_data,
+	mk_pdf_surface,
+	mk_svg_surface,
 
 	pattern,
 	mk_pattern_from_rgb,
@@ -488,6 +490,8 @@ native mod ccairo {
 	fn cairo_pdf_surface_restrict_to_version(surface: ctypes::intptr_t, version: ctypes::c_int);
 	fn cairo_svg_surface_restrict_to_version(surface: ctypes::intptr_t, version: ctypes::c_int);
 	fn cairo_pdf_surface_set_size(surface: ctypes::intptr_t, width: f64, height: f64);
+	fn cairo_pdf_surface_create(path: *u8, width: f64, height: f64) -> ctypes::intptr_t;
+	fn cairo_svg_surface_create(path: *u8, width: f64, height: f64) -> ctypes::intptr_t;
 	
 	fn cairo_device_reference(device: ctypes::intptr_t) -> ctypes::intptr_t;
 	fn cairo_device_destroy(device: ctypes::intptr_t);
@@ -840,7 +844,7 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 	
 	// General
 
-	fn write_to_file(file: str) -> status unsafe { // TODO more image formats
+	fn write_to_file(file: str) -> status unsafe { // TODO more image formats FIXME remove files from svg and pdf constructors and allow them to be written like this instead
 		let path = std::fs::make_absolute(file);
 		let split = std::fs::splitext(path);
 		let bytes = core::str::bytes(path);
@@ -850,12 +854,6 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 		alt split {
 			(base, ".png") {
 				ret ccairo::cairo_surface_write_to_png(internal, core::vec::unsafe::to_ptr(bytes)) as status;
-			}
-			(base, ".svg") { //TODO
-				ret STATUS_WRITE_ERROR;
-			}
-			(base, ".pdf") { //TODO
-				ret STATUS_WRITE_ERROR;
 			}
 			(base, _) {
 				ret STATUS_WRITE_ERROR;
@@ -938,6 +936,28 @@ resource surface_res(internal: ctypes::intptr_t) {
 
 fn mk_surface_from_similar(other: surface, content: content, width: uint, height: uint) -> surface unsafe {
 	let internal: ctypes::intptr_t = ccairo::cairo_surface_create_similar(other.get_internal(), content, width as ctypes::c_int, height as ctypes::c_int);
+	let res = @surface_res(internal);
+	
+	ret surface(internal, res);
+}
+fn mk_pdf_surface(file: str, width_in_points: float, height_in_points: float) -> surface unsafe {
+	let path = std::fs::make_absolute(file);
+	let bytes = core::str::bytes(path);
+		
+	core::vec::push(bytes, 0 as u8);
+	
+	let internal: ctypes::intptr_t = ccairo::cairo_pdf_surface_create(core::vec::unsafe::to_ptr(bytes), width_in_points, height_in_points);
+	let res = @surface_res(internal);
+	
+	ret surface(internal, res);
+}
+fn mk_svg_surface(file: str, width_in_points: float, height_in_points: float) -> surface unsafe {
+	let path = std::fs::make_absolute(file);
+	let bytes = core::str::bytes(path);
+		
+	core::vec::push(bytes, 0 as u8);
+	
+	let internal: ctypes::intptr_t = ccairo::cairo_svg_surface_create(core::vec::unsafe::to_ptr(bytes), width_in_points, height_in_points);
 	let res = @surface_res(internal);
 	
 	ret surface(internal, res);
