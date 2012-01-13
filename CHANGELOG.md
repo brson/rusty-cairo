@@ -1,5 +1,6 @@
 ## v0.2
 
+* Added get_version (gets bindings version) and get_cairo_version (gets internal cairo version).
 * Fixed strict type requirements on different architectures.
 * Fixed incorrect values on some constants.
 * Added messages for all failures.
