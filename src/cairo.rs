@@ -260,9 +260,26 @@ export
 /*
  * FIXME all wrapped objects need to be cached rather than 
  * recreating new objects every time for each internal cairo pointer
-*/
+ *
+ * TODO more image formats
+ 
+ * FIXME make special surfaces output by write_to_file
+ * rather than providing output file in constructor
+ * (make a temp file and then copy file when outputting? only other way is to use cairo streams)
+ 
+ * TODO possibly make mk_svg_surface_from_file, using libsvg-cairo (I think it supports this)
+ */
+
+#[link_name = ""]
+#[nolink]
+#[abi = "cdecl"]
+native mod c {
+	fn fopen(path: *u8, mode: *u8) -> ctypes::intptr_t;
+	fn fclose(file: ctypes::intptr_t);
+}
 
 #[link_name = "freetype"]
+#[abi = "cdecl"]
 native mod cft {
 	fn FT_Init_FreeType(library: *ctypes::intptr_t) -> ctypes::c_int;
 	fn FT_New_Face(library: ctypes::intptr_t, path: *u8, offset: ctypes::long, face: *ctypes::intptr_t) -> ctypes::c_int;
@@ -270,6 +287,7 @@ native mod cft {
 }
 
 #[link_name = "cairo"]
+#[abi = "cdecl"]
 native mod ccairo {
 	fn cairo_ft_font_face_create_for_ft_face(ft_face: ctypes::intptr_t, flags: ctypes::c_int) -> ctypes::intptr_t;
 	fn cairo_font_face_set_user_data(face: ctypes::intptr_t, key: ctypes::intptr_t, ft_face: ctypes::intptr_t, cb: ctypes::intptr_t);	
@@ -879,7 +897,7 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 	
 	// General
 
-	fn write_to_file(file: str) -> status unsafe { // TODO more image formats FIXME remove files from svg and pdf constructors and allow them to be written like this instead
+	fn write_to_file(file: str) -> status unsafe {
 		let path = std::fs::make_absolute(file);
 		let split = std::fs::splitext(path);
 		let bytes = core::str::bytes(path);
@@ -972,6 +990,11 @@ resource surface_res(internal: ctypes::intptr_t) {
 fn mk_surface_from_similar(other: surface, content: content, width: uint, height: uint) -> surface unsafe {
 	let internal: ctypes::intptr_t = ccairo::cairo_surface_create_similar(other.get_internal(), content as ctypes::c_int, width as ctypes::c_int, height as ctypes::c_int);
 	let res = @surface_res(internal);
+	let status = ccairo::cairo_surface_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a surface from a similar surface: %s", status_to_str(status));
+	}
 	
 	ret surface(internal, res);
 }
@@ -983,6 +1006,11 @@ fn mk_pdf_surface(file: str, width_in_points: float, height_in_points: float) ->
 	
 	let internal: ctypes::intptr_t = ccairo::cairo_pdf_surface_create(core::vec::unsafe::to_ptr(bytes), width_in_points, height_in_points);
 	let res = @surface_res(internal);
+	let status = ccairo::cairo_surface_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make an PDF surface: %s", status_to_str(status));
+	}
 	
 	ret surface(internal, res);
 }
@@ -994,6 +1022,11 @@ fn mk_svg_surface(file: str, width_in_points: float, height_in_points: float) ->
 	
 	let internal: ctypes::intptr_t = ccairo::cairo_svg_surface_create(core::vec::unsafe::to_ptr(bytes), width_in_points, height_in_points);
 	let res = @surface_res(internal);
+	let status = ccairo::cairo_surface_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make an SVG surface: %s", status_to_str(status));
+	}
 	
 	ret surface(internal, res);
 }
@@ -1005,44 +1038,79 @@ fn mk_ps_surface(file: str, width_in_points: float, height_in_points: float) -> 
 	
 	let internal: ctypes::intptr_t = ccairo::cairo_ps_surface_create(core::vec::unsafe::to_ptr(bytes), width_in_points, height_in_points);
 	let res = @surface_res(internal);
+	let status = ccairo::cairo_surface_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make an PS surface: %s", status_to_str(status));
+	}
 	
 	ret surface(internal, res);
 }
 fn mk_image_surface(format: format, width: uint, height: uint) -> surface {
 	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create(format as ctypes::c_int, width as ctypes::c_int, height as ctypes::c_int);
 	let res = @surface_res(internal);
+	let status = ccairo::cairo_surface_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make an image surface: %s", status_to_str(status));
+	}
 	
 	ret surface(internal, res);
 }
 fn mk_image_surface_from_file(file: str) -> surface unsafe {
-	// Only PNG TODO add libjpeg and others later on (because that would be a cool extended feature)
+	// TODO .jpg (maybe .bmp)
 	let path = std::fs::make_absolute(file);
 	let split = std::fs::splitext(path);
 	let bytes = core::str::bytes(path);
 	let internal: ctypes::intptr_t;
 	
 	core::vec::push(bytes, 0 as u8);
+	
+	let path_cstr: *u8 = core::vec::unsafe::to_ptr(bytes);
 		
 	alt split {
 		(base, ".png") {
-			internal = ccairo::cairo_image_surface_create_from_png(core::vec::unsafe::to_ptr(bytes));
+			/*
+			 * Let's leave cairo to do the actual PNG work seeing as it supports it
+			 * by default, I just want to have a failure for the
+			 * obvious non-existant file/no read error consistent with other formats when they are added
+			 */
+		
+			let mode = "rb";
+			let mode_bytes = core::str::bytes(mode);
+			let mode_cstr = core::vec::unsafe::to_ptr(mode_bytes);
+			let file: ctypes::intptr_t = c::fopen(path_cstr, mode_cstr);
+			
+			if file == (0 as ctypes::intptr_t) {
+				fail "Could not make an image surface from a file: unable to load image";
+			}
+			
+			c::fclose(file);
+			
+			internal = ccairo::cairo_image_surface_create_from_png(path_cstr);
 		}
 		(base, _) {
-			fail "Could not make an image surface from a file due to an unsupported image extension";
+			fail "Could not make an image surface from a file: unsupported image format";
 		}
 	}
 	
-	if ccairo::cairo_surface_status(internal) as status != STATUS_SUCCESS {
-		fail "Could not make an image surface from a file";
-	}
-
 	let res = @surface_res(internal);
+	let status = ccairo::cairo_surface_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make an image surface from a file: %s", status_to_str(status));
+	}
 	
 	ret surface(internal, res);
 }
 fn mk_image_surface_from_data(data: [u8], format: format, width: uint, height: uint, stride: uint) -> surface unsafe {
 	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create_for_data(core::vec::unsafe::to_ptr(data), format as ctypes::c_int, width as ctypes::c_int, height as ctypes::c_int, stride as ctypes::c_int);
 	let res = @surface_res(internal);
+	let status = ccairo::cairo_surface_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make an image surface from data: %s", status_to_str(status));
+	}
 	
 	ret surface(internal, res);
 }
@@ -1166,30 +1234,55 @@ resource pattern_res(internal: ctypes::intptr_t) {
 fn mk_pattern_from_rgb(red: float, green: float, blue: float) -> pattern {
 	let internal: ctypes::intptr_t = ccairo::cairo_pattern_create_rgb(red, green, blue);
 	let res = @pattern_res(internal);
+	let status = ccairo::cairo_pattern_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a pattern from an RGB value: %s", status_to_str(status));
+	}
 	
 	ret pattern(internal, res);
 }
 fn mk_pattern_from_rgba(red: float, green: float, blue: float, alpha: float) -> pattern {
 	let internal: ctypes::intptr_t = ccairo::cairo_pattern_create_rgba(red, green, blue, alpha);
 	let res = @pattern_res(internal);
+	let status = ccairo::cairo_pattern_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a pattern from an RGBA value: %s", status_to_str(status));
+	}
 	
 	ret pattern(internal, res);
 }
 fn mk_pattern_from_linear_gradient(x0: float, y0: float, x1: float, y1: float) -> pattern {
 	let internal: ctypes::intptr_t = ccairo::cairo_pattern_create_linear(x0, y0, x1, y1);
 	let res = @pattern_res(internal);
+	let status = ccairo::cairo_pattern_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a pattern from a linear gradient: %s", status_to_str(status));
+	}
 	
 	ret pattern(internal, res);
 }
 fn mk_pattern_from_radial_gradient(cx0: float, cy0: float, radius0: float, cx1: float, cy1: float, radius1: float) -> pattern {
 	let internal: ctypes::intptr_t = ccairo::cairo_pattern_create_radial(cx0, cy0, radius0, cx1, cy1, radius1);
 	let res = @pattern_res(internal);
+	let status = ccairo::cairo_pattern_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a pattern from a radial gradient: %s", status_to_str(status));
+	}
 	
 	ret pattern(internal, res);
 }
 fn mk_pattern_from_surface(surface: surface) -> pattern {
 	let internal: ctypes::intptr_t = ccairo::cairo_pattern_create_for_surface(surface.get_internal());
 	let res = @pattern_res(internal);
+	let status = ccairo::cairo_pattern_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a pattern from a surface: %s", status_to_str(status));
+	}
 	
 	ret pattern(internal, res);
 }
@@ -1511,6 +1604,11 @@ fn mk_font_face_from_toy_font(family: str, slant: font_slant, weight: font_weigh
 	let internal: ctypes::intptr_t = ccairo::cairo_toy_font_face_create(core::vec::unsafe::to_ptr(bytes), slant as ctypes::c_int, weight as ctypes::c_int);
 	let res = @font_face_res(internal);
 	let backend_res = @font_face_backend_res(0 as ctypes::intptr_t);
+	let status = ccairo::cairo_font_face_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a font face from a toy font: %s", status_to_str(status));
+	}
 	
 	ret font_face(internal, res, backend_res);
 }
@@ -1530,23 +1628,28 @@ fn mk_font_face_from_file(file: str) -> font_face unsafe {
 			let library_internal: ctypes::intptr_t = 0 as ctypes::intptr_t;
 
 			if cft::FT_Init_FreeType(core::ptr::addr_of(library_internal)) != (0 as ctypes::c_int) {
-				fail "Could not make a font face from a font file";
+				fail "Could not make a font face from a font file: unable to initialize freetype";
 			}
 
 			if cft::FT_New_Face(library_internal, core::vec::unsafe::to_ptr(bytes), 0 as ctypes::long, core::ptr::addr_of(face_internal)) != (0 as ctypes::c_int) {
-				fail "Could not make a font face from a font file";
+				fail "Could not make a font face from a font file: unable to load font";
 			}
 			
 			backend_internal = face_internal;
 			internal = ccairo::cairo_ft_font_face_create_for_ft_face(face_internal, 0 as ctypes::c_int);
 		}
 		(base, _) {
-			fail "Could not make a font face from a font file due to an unsupported font extension";
+			fail "Could not make a font face from a font file: unsupported font extension";
 		}
 	}
 	
 	let res = @font_face_res(internal);
 	let backend_res = @font_face_backend_res(backend_internal);
+	let status = ccairo::cairo_font_face_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a font face from a file: %s", status_to_str(status));
+	}
 	
 	ret font_face(internal, res, backend_res);
 }
@@ -2256,6 +2359,11 @@ resource context_res(internal: ctypes::intptr_t) {
 fn mk_context(surface: surface) -> context {
 	let internal: ctypes::intptr_t = ccairo::cairo_create(surface.get_internal());
 	let res = @context_res(internal);
+	let status = ccairo::cairo_status(internal) as status;
+	
+	if status != STATUS_SUCCESS {
+		fail #fmt("Could not make a context: %s", status_to_str(status));
+	}
 	
 	ret context(internal, res);
 }
