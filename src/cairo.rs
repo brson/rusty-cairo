@@ -1709,10 +1709,10 @@ fn wrap_font_face(record: @font_face_free_record) -> font_face {
 			ret ccairo::cairo_font_face_get_type(self.internal) as font_type;
 		}
 		fn get_toy_slant() -> font_slant {
-			ret ccairo::cairo_toy_font_face_get_slant(self.internal);
+			ret ccairo::cairo_toy_font_face_get_slant(self.internal) as font_slant;
 		}
 		fn get_toy_weight() -> font_weight {
-			ret ccairo::cairo_toy_font_face_get_weight(self.internal);
+			ret ccairo::cairo_toy_font_face_get_weight(self.internal) as font_weight;
 		}
 		fn get_toy_family() -> str unsafe {
 			ret core::str::from_cstr(ccairo::cairo_toy_font_face_get_family(self.internal));
