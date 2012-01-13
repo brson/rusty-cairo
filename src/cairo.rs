@@ -1,4 +1,4 @@
-#[link(name = "cairo", vers = "0.2pre", author = "Zack0Wack0")];
+#[link(name = "cairo", vers = "0.2", author = "Zack0Wack0")];
 #[crate_type = "lib"];
 
 use std;
@@ -2591,7 +2591,7 @@ fn status_to_str(status: status) -> str unsafe {
 	ret core::str::from_cstr(ccairo::cairo_status_to_string(status as core::ctypes::c_int));
 }
 fn get_version() -> str {
-	ret "v0.2pre";
+	ret "v0.2";
 }
 fn get_cairo_version() -> str unsafe {
 	ret core::str::from_cstr(ccairo::cairo_version_string());
