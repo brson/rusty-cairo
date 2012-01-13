@@ -544,7 +544,7 @@ const STATUS_LAST_STATUS: int = 36;
 type status = int;
 
 fn status_to_str(status: status) -> str unsafe {
-	ret core::str::from_cstr(ccairo::cairo_status_to_string(status));
+	ret core::str::from_cstr(ccairo::cairo_status_to_string(status as ctypes::c_int));
 }
 
 const FORMAT_INVALID: int = -1;
@@ -556,8 +556,8 @@ const FORMAT_RGB16_565: int = 4;
 
 type format = int;
 
-fn format_stride_for_width(format: format, width: int) -> int {
-	ret ccairo::cairo_format_stride_for_width(format, width);
+fn format_stride_for_width(format: format, width: uint) -> uint {
+	ret ccairo::cairo_format_stride_for_width(format as ctypes::c_int, width as ctypes::c_int) as uint;
 }
 
 const FONT_SLANT_NORMAL: int = 0;
@@ -773,7 +773,7 @@ obj device(internal: ctypes::intptr_t, res: @device_res) {
 		ret ccairo::cairo_device_get_type(internal) as device_type;
 	}
 	fn acquire() -> status {
-		ret ccairo::cairo_device_acquire(internal);
+		ret ccairo::cairo_device_acquire(internal) as status;
 	}
 	fn release() {
 		ccairo::cairo_device_release(internal);
@@ -801,10 +801,10 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 	fn restrict_to_pdf_version(version: str) {
 		alt version {
 			"1.4" {
-				ccairo::cairo_pdf_surface_restrict_to_version(internal, 0);
+				ccairo::cairo_pdf_surface_restrict_to_version(internal, 0 as ctypes::c_int);
 			}
 			"1.5" {
-				ccairo::cairo_pdf_surface_restrict_to_version(internal, 1);
+				ccairo::cairo_pdf_surface_restrict_to_version(internal, 1 as ctypes::c_int);
 			}
 		}
 	}
@@ -814,10 +814,10 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 	fn restrict_to_svg_version(version: str) {
 		alt version {
 			"1.1" {
-				ccairo::cairo_svg_surface_restrict_to_version(internal, 0);
+				ccairo::cairo_svg_surface_restrict_to_version(internal, 0 as ctypes::c_int);
 			}
 			"1.2" {
-				ccairo::cairo_svg_surface_restrict_to_version(internal, 1);
+				ccairo::cairo_svg_surface_restrict_to_version(internal, 1 as ctypes::c_int);
 			}
 		}
 	}
@@ -920,7 +920,7 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 		ccairo::cairo_surface_show_page(internal);
 	}
 	fn has_show_text_glyphs() -> bool {
-		ret ccairo::cairo_surface_has_show_text_glyphs(internal) == 1;
+		ret ccairo::cairo_surface_has_show_text_glyphs(internal) == (1 as ctypes::c_int);
 	}
 	
 	// Misc
@@ -935,7 +935,7 @@ resource surface_res(internal: ctypes::intptr_t) {
 }
 
 fn mk_surface_from_similar(other: surface, content: content, width: uint, height: uint) -> surface unsafe {
-	let internal: ctypes::intptr_t = ccairo::cairo_surface_create_similar(other.get_internal(), content, width as ctypes::c_int, height as ctypes::c_int);
+	let internal: ctypes::intptr_t = ccairo::cairo_surface_create_similar(other.get_internal(), content as ctypes::c_int, width as ctypes::c_int, height as ctypes::c_int);
 	let res = @surface_res(internal);
 	
 	ret surface(internal, res);
@@ -963,7 +963,7 @@ fn mk_svg_surface(file: str, width_in_points: float, height_in_points: float) ->
 	ret surface(internal, res);
 }
 fn mk_image_surface(format: format, width: uint, height: uint) -> surface {
-	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create(format, width as ctypes::c_int, height as ctypes::c_int);
+	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create(format as ctypes::c_int, width as ctypes::c_int, height as ctypes::c_int);
 	let res = @surface_res(internal);
 	
 	ret surface(internal, res);
@@ -995,7 +995,7 @@ fn mk_image_surface_from_file(file: str) -> surface unsafe {
 	ret surface(internal, res);
 }
 fn mk_image_surface_from_data(data: [u8], format: format, width: uint, height: uint, stride: uint) -> surface unsafe {
-	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create_for_data(core::vec::unsafe::to_ptr(data), format, width as ctypes::c_int, height as ctypes::c_int, stride as ctypes::c_int);
+	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create_for_data(core::vec::unsafe::to_ptr(data), format as ctypes::c_int, width as ctypes::c_int, height as ctypes::c_int, stride as ctypes::c_int);
 	let res = @surface_res(internal);
 	
 	ret surface(internal, res);
@@ -1014,12 +1014,12 @@ obj pattern(internal: ctypes::intptr_t, res: @pattern_res) {
 	fn add_color_stop_rgba(offset: float, red: float, green: float, blue: float, alpha: float) {
 		ccairo::cairo_pattern_add_color_stop_rgba(internal, offset, red, green, blue, alpha);
 	}
-	fn get_color_stop_count() -> int {
-		let count: ctypes::c_int = 0;
+	fn get_color_stop_count() -> uint {
+		let count: ctypes::c_int = 0 as ctypes::c_int;
 		
 		ccairo::cairo_pattern_get_color_stop_count(internal, core::ptr::addr_of(count));
 		
-		ret count;
+		ret count as uint;
 	}
 	fn get_color_stop(index: uint) -> (float, float, float, float, float) {
 		let offset: f64 = 0.0;
@@ -1077,13 +1077,13 @@ obj pattern(internal: ctypes::intptr_t, res: @pattern_res) {
 		ret ccairo::cairo_pattern_status(internal) as status;
 	}
 	fn set_extend(extend: extend) {
-		ccairo::cairo_pattern_set_extend(internal, extend);
+		ccairo::cairo_pattern_set_extend(internal, extend as ctypes::c_int);
 	}
 	fn get_extend() -> extend {
 		ret ccairo::cairo_pattern_get_extend(internal) as extend;
 	}
 	fn set_filter(filter: filter) {
-		ccairo::cairo_pattern_set_filter(internal, filter);
+		ccairo::cairo_pattern_set_filter(internal, filter as ctypes::c_int);
 	}
 	fn get_extend() -> extend {
 		ret ccairo::cairo_pattern_get_filter(internal) as filter;
@@ -1462,7 +1462,7 @@ fn mk_font_face_from_toy_font(family: str, slant: font_slant, weight: font_weigh
 	
 	core::vec::push(bytes, 0 as u8);
 	
-	let internal: ctypes::intptr_t = ccairo::cairo_toy_font_face_create(core::vec::unsafe::to_ptr(bytes), slant, weight);
+	let internal: ctypes::intptr_t = ccairo::cairo_toy_font_face_create(core::vec::unsafe::to_ptr(bytes), slant as ctypes::c_int, weight as ctypes::c_int);
 	let res = @font_face_res(internal);
 	let backend_res = @font_face_backend_res(0 as ctypes::intptr_t);
 	
@@ -1483,16 +1483,16 @@ fn mk_font_face_from_file(file: str) -> font_face unsafe {
 			let face_internal: ctypes::intptr_t = 0 as ctypes::intptr_t;
 			let library_internal: ctypes::intptr_t = 0 as ctypes::intptr_t;
 
-			if cft::FT_Init_FreeType(core::ptr::addr_of(library_internal)) != 0 {
+			if cft::FT_Init_FreeType(core::ptr::addr_of(library_internal)) != (0 as ctypes::c_int) {
 				fail;
 			}
 
-			if cft::FT_New_Face(library_internal, core::vec::unsafe::to_ptr(bytes), 0, core::ptr::addr_of(face_internal)) != 0{
+			if cft::FT_New_Face(library_internal, core::vec::unsafe::to_ptr(bytes), 0 as ctypes::long, core::ptr::addr_of(face_internal)) != (0 as ctypes::c_int) {
 				fail;
 			}
 			
 			backend_internal = face_internal;
-			internal = ccairo::cairo_ft_font_face_create_for_ft_face(face_internal, 0);
+			internal = ccairo::cairo_ft_font_face_create_for_ft_face(face_internal, 0 as ctypes::c_int);
 		}
 		(base, _) {
 			fail;
@@ -1632,7 +1632,7 @@ obj font_options(internal: ctypes::intptr_t, res: @font_options_res) {
 	// General
 	
 	fn get_status() -> status {
-		ret ccairo::cairo_font_options_status(internal);
+		ret ccairo::cairo_font_options_status(internal) as status;
 	}
 	/* FIXME fn merge(other: font_options) {
 	}*/
@@ -1642,25 +1642,25 @@ obj font_options(internal: ctypes::intptr_t, res: @font_options_res) {
 	/* FIXME fn equals(other: font_options) -> bool {
 	}*/
 	fn set_antialias(antialias: antialias) {
-		ccairo::cairo_font_options_set_antialias(internal, antialias);
+		ccairo::cairo_font_options_set_antialias(internal, antialias as ctypes::c_int);
 	}
 	fn get_antialias() -> antialias {
 		ret ccairo::cairo_font_options_get_antialias(internal) as antialias;
 	}
 	fn set_subpixel_order(order: subpixel_order) {
-		ccairo::cairo_font_options_set_subpixel_order(internal, order);
+		ccairo::cairo_font_options_set_subpixel_order(internal, order as ctypes::c_int);
 	}
 	fn get_subpixel_order() -> subpixel_order {
 		ret ccairo::cairo_font_options_get_subpixel_order(internal) as subpixel_order;
 	}
 	fn set_hint_style(hint: hint_style) {
-		ccairo::cairo_font_options_set_hint_style(internal, hint);
+		ccairo::cairo_font_options_set_hint_style(internal, hint as ctypes::c_int);
 	}
 	fn get_hint_style() -> hint_style {
 		ret ccairo::cairo_font_options_get_hint_style(internal) as hint_style;
 	}
 	fn set_hint_metrics(hint: hint_metrics) {
-		ccairo::cairo_font_options_set_hint_metrics(internal, hint);
+		ccairo::cairo_font_options_set_hint_metrics(internal, hint as ctypes::c_int);
 	}
 	fn get_hint_metrics() -> hint_metrics {
 		ret ccairo::cairo_font_options_get_hint_metrics(internal) as hint_metrics;
@@ -1716,7 +1716,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ccairo::cairo_push_group(internal);
 	}
 	fn push_group_with_content(content: content) {
-		ccairo::cairo_push_group_with_content(internal, content);
+		ccairo::cairo_push_group_with_content(internal, content as ctypes::c_int);
 	}
 	fn pop_group() -> pattern {
 		let other_internal: ctypes::intptr_t = ccairo::cairo_pop_group(internal);
@@ -1752,7 +1752,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret pattern(other_internal, other_res);
 	}
 	fn set_antialias(antialias: antialias) {
-		ccairo::cairo_set_antialias(internal, antialias);
+		ccairo::cairo_set_antialias(internal, antialias as ctypes::c_int);
 	}
 	fn get_antialias() -> antialias {
 		ret ccairo::cairo_get_antialias(internal) as antialias;
@@ -1760,8 +1760,8 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 	fn set_dash(dashes: [float], offset: float) unsafe {
 		ccairo::cairo_set_dash(internal, core::vec::unsafe::to_ptr(dashes), core::vec::len(dashes) as ctypes::c_int, offset);
 	}
-	fn get_dash_count() -> int {
-		ret ccairo::cairo_get_dash_count(internal);
+	fn get_dash_count() -> uint {
+		ret ccairo::cairo_get_dash_count(internal) as uint;
 	}
 	fn get_dash() -> [float] unsafe {
 		let dashes: [f64] = [];
@@ -1778,19 +1778,19 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret offset;
 	}
 	fn set_fill_rule(rule: fill_rule) {
-		ccairo::cairo_set_fill_rule(internal, rule);
+		ccairo::cairo_set_fill_rule(internal, rule as ctypes::c_int);
 	}
 	fn get_fill_rule() -> fill_rule {
 		ret ccairo::cairo_get_fill_rule(internal) as fill_rule;
 	}
 	fn set_line_cap(cap: line_cap) {
-		ccairo::cairo_set_line_cap(internal, cap);
+		ccairo::cairo_set_line_cap(internal, cap as ctypes::c_int);
 	}
 	fn get_line_cap() -> line_cap {
 		ret ccairo::cairo_get_line_cap(internal) as line_cap;
 	}
 	fn set_line_join(join: line_join) {
-		ccairo::cairo_set_line_join(internal, join);
+		ccairo::cairo_set_line_join(internal, join as ctypes::c_int);
 	}
 	fn get_line_join() -> line_join {
 		ret ccairo::cairo_get_line_join(internal) as line_join;
@@ -1808,7 +1808,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret ccairo::cairo_get_miter_limit(internal);
 	}
 	fn set_operator(op: operator) {
-		ccairo::cairo_set_operator(internal, op);
+		ccairo::cairo_set_operator(internal, op as ctypes::c_int);
 	}
 	fn get_operator() -> operator {
 		ret ccairo::cairo_get_operator(internal) as operator;
@@ -1836,7 +1836,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret (x1, y1, x2, y2);
 	}
 	fn in_clip(x: float, y: float) -> bool {
-		ret ccairo::cairo_in_clip(internal,x,y) == 1;
+		ret ccairo::cairo_in_clip(internal, x, y) == (1 as ctypes::c_int);
 	}
 	fn reset_clip() {
 		ccairo::cairo_reset_clip(internal);
@@ -1858,7 +1858,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret (x1, y1, x2, y2);
 	}
 	fn in_fill(x: float, y: float) -> bool {
-		ret ccairo::cairo_in_fill(internal, x, y) == 1;
+		ret ccairo::cairo_in_fill(internal, x, y) == (1 as ctypes::c_int);
 	}
 	fn mask(pattern: pattern) {
 		ccairo::cairo_mask(internal, pattern.get_internal());
@@ -1889,7 +1889,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ret (x1, y1, x2, y2);
 	}
 	fn in_stroke(x: float, y: float) -> bool {
-		ret ccairo::cairo_in_stroke(internal, x, y) == 1;
+		ret ccairo::cairo_in_stroke(internal, x, y) == (1 as ctypes::c_int);
 	}
 	fn copy_page() {
 		ccairo::cairo_copy_page(internal);
@@ -1916,7 +1916,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		ccairo::cairo_append_path(internal, path.get_internal());
 	}
 	fn has_current_point() -> bool {
-		ret ccairo::cairo_has_current_point(internal) == 1;
+		ret ccairo::cairo_has_current_point(internal) == (1 as ctypes::c_int);
 	}
 	fn get_current_point() -> (float, float) {
 		let x: f64 = 0.0;
@@ -2055,7 +2055,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 		
 		core::vec::push(bytes, 0 as u8);
 		
-		ccairo::cairo_select_font_face(internal, core::vec::unsafe::to_ptr(bytes), slant, weight);
+		ccairo::cairo_select_font_face(internal, core::vec::unsafe::to_ptr(bytes), slant as ctypes::c_int, weight as ctypes::c_int);
 	}
 	fn set_font_size(size: float) {
 		ccairo::cairo_set_font_size(internal, size);
@@ -2139,7 +2139,7 @@ obj context(internal: ctypes::intptr_t, res: @context_res) {
 			cclusters += [cluster.get_internal()];
 		}
 		
-		ccairo::cairo_show_text_glyphs(internal, core::vec::unsafe::to_ptr(bytes), core::vec::len(bytes) as ctypes::c_int, core::vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, core::vec::len(cglyphs) as ctypes::c_int, core::vec::unsafe::to_ptr(cclusters) as ctypes::intptr_t, core::vec::len(cclusters) as ctypes::c_int, cluster_flags);
+		ccairo::cairo_show_text_glyphs(internal, core::vec::unsafe::to_ptr(bytes), core::vec::len(bytes) as ctypes::c_int, core::vec::unsafe::to_ptr(cglyphs) as ctypes::intptr_t, core::vec::len(cglyphs) as ctypes::c_int, core::vec::unsafe::to_ptr(cclusters) as ctypes::intptr_t, core::vec::len(cclusters) as ctypes::c_int, cluster_flags as ctypes::c_int);
 	}
 	fn font_extents() -> font_extents {
 		let record: font_extents_record = {
