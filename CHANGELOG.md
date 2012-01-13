@@ -1,5 +1,8 @@
 ## v0.2
 
+* Fixed copy_path_flat.
+* Upgraded to implementation and interfaces in Rust, rather than objs (objs are now deprecated).
+* Fixed freetype fonts being cleaned up correctly (valgrind now reports 0 errors).
 * Added get_version (gets bindings version) and get_cairo_version (gets internal cairo version).
 * Fixed strict type requirements on different architectures.
 * Fixed incorrect values on some constants.
