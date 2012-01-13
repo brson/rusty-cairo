@@ -1,6 +1,28 @@
 ## Synopsis
 
-This project contains bindings of the [cairo vector graphics](http://cairographics.org) library to the system programming language [Rust](http://rust-lang.org). This library allows you to draw with vector graphics and then export them as PDFs, SVGs and PDFs. In the future, this library may have a utility for drawing into a GUI window on all operating systems (ie. it would use X11 on linux, Quartz on Mac, Win32 API on Windows, etc). The library also includes loading of TTF fonts via freetype (more backends later on).
+This project contains bindings of the [cairo vector graphics](http://cairographics.org) library to the system programming language [Rust](http://rust-lang.org). This library allows you to draw with vector graphics and then export them as PDFs, SVGs and PDFs. In the future, this library may have a utility for drawing into a GUI window on all operating systems (ie. it would use X11 on linux, Quartz on Mac, Win32 API on Windows, etc). The library also includes loading of TTF fonts via freetype (more backends later on).  
+  
+The following is a very basic example and only touches the power of the cairo library:
+
+```rust
+use std;
+use cairo;
+import core::f64::consts;
+
+fn main() {
+	let surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, 100u, 100u);
+	let context = cairo::mk_context(surface);
+	
+	context.set_source_rgb(1.0, 0.0, 0.0); // Change our drawing colour to red
+	context.paint(); // Paint the entire surface with red
+	context.set_source_rgb(1.0, 1.0, 1.0); // Change our drawing colour to white
+	context.arc(50.0, 50.0, 50.0, 0.0, core::f64::consts::pi * 2.0); // "Path" a circle at (50, 50) with a radius of 50, and then make it start at 0 radians and then stretch to 2 radians (full circle/arc)
+	context.fill(); // This fills paths in with the current colour, hence it fills a white circle
+	
+	surface.write_to_file("cairo-example.png"); // Finally, render the vector operations we just did into an PNG file
+}
+```
+It renders a vector graphic into the PNG file "cairo-example.png" which *should* contain a red background with a white circle in the middle with it's circumference touching the sides of the image.
 
 ## Dependencies
 
@@ -31,7 +53,7 @@ use std;
 use cairo;
 ```
 
-The library currently requires the std module and for some reason rust refuses to import the std module by default when `use cairo;` is called, so using only `use cairo;` throws compile errors.
+The library currently requires the std module and for some reason rust refuses to import the std module by default when `use cairo;` is called, so using only `use cairo;` without first using the std module throws compile errors.
 
 ## Testing
 
