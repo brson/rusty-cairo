@@ -6,6 +6,9 @@ import std::{fs, tempfile};
 import core::{ptr, vec, str};
 
 export 
+	get_version,
+	get_cairo_version,
+	
 	STATUS_SUCCESS,
 	STATUS_NO_MEMORY,
 	STATUS_INVALID_RESTORE,
@@ -271,6 +274,7 @@ native mod ccairo {
 	fn cairo_ft_font_face_create_for_ft_face(ft_face: ctypes::intptr_t, flags: ctypes::c_int) -> ctypes::intptr_t;
 	fn cairo_font_face_set_user_data(face: ctypes::intptr_t, key: ctypes::intptr_t, ft_face: ctypes::intptr_t, cb: ctypes::intptr_t);	
 
+	fn cairo_version_string() -> *u8;
 	fn cairo_create(surface: ctypes::intptr_t) -> ctypes::intptr_t;
 	fn cairo_reference(context: ctypes::intptr_t) -> ctypes::intptr_t;
 	fn cairo_destroy(context: ctypes::intptr_t);
@@ -552,10 +556,6 @@ const STATUS_LAST_STATUS: int = 36;
 
 type status = int;
 
-fn status_to_str(status: status) -> str unsafe {
-	ret core::str::from_cstr(ccairo::cairo_status_to_string(status as ctypes::c_int));
-}
-
 const FORMAT_INVALID: int = -1;
 const FORMAT_ARGB32: int = 0;
 const FORMAT_RGB24: int = 1;
@@ -564,10 +564,6 @@ const FORMAT_A1: int = 3;
 const FORMAT_RGB16_565: int = 4;
 
 type format = int;
-
-fn format_stride_for_width(format: format, width: uint) -> uint {
-	ret ccairo::cairo_format_stride_for_width(format as ctypes::c_int, width as ctypes::c_int) as uint;
-}
 
 const FONT_SLANT_NORMAL: int = 0;
 const FONT_SLANT_ITALIC: int = 1;
@@ -2262,4 +2258,20 @@ fn mk_context(surface: surface) -> context {
 	let res = @context_res(internal);
 	
 	ret context(internal, res);
+}
+
+/*
+ * Utilities
+ */
+fn format_stride_for_width(format: format, width: uint) -> uint {
+	ret ccairo::cairo_format_stride_for_width(format as ctypes::c_int, width as ctypes::c_int) as uint;
+}
+fn status_to_str(status: status) -> str unsafe {
+	ret core::str::from_cstr(ccairo::cairo_status_to_string(status as ctypes::c_int));
+}
+fn get_version() -> str {
+	ret "v0.2pre";
+}
+fn get_cairo_version() -> str unsafe {
+	ret core::str::from_cstr(ccairo::cairo_version_string());
 }
