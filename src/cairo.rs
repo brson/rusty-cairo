@@ -218,6 +218,7 @@ export
 	mk_image_surface_from_data,
 	mk_pdf_surface,
 	mk_svg_surface,
+	mk_ps_surface,
 
 	pattern,
 	mk_pattern_from_rgb,
@@ -492,6 +493,14 @@ native mod ccairo {
 	fn cairo_pdf_surface_set_size(surface: ctypes::intptr_t, width: f64, height: f64);
 	fn cairo_pdf_surface_create(path: *u8, width: f64, height: f64) -> ctypes::intptr_t;
 	fn cairo_svg_surface_create(path: *u8, width: f64, height: f64) -> ctypes::intptr_t;
+	fn cairo_ps_surface_restrict_to_level(surface: ctypes::intptr_t, level: ctypes::c_int);
+	fn cairo_ps_surface_set_size(surface: ctypes::intptr_t, width: f64, height: f64);
+	fn cairo_ps_surface_set_eps(surface: ctypes::intptr_t, eps: ctypes::c_int);
+	fn cairo_ps_surface_get_eps(surface: ctypes::intptr_t) -> ctypes::c_int;
+	fn cairo_ps_surface_dsc_begin_setup(surface: ctypes::intptr_t);
+	fn cairo_ps_surface_dsc_begin_page_setup(surface: ctypes::intptr_t);
+	fn cairo_ps_surface_dsc_comment(surface: ctypes::intptr_t, text: *u8);
+	fn cairo_ps_surface_create(path: *u8, width: f64, height: f64) -> ctypes::intptr_t;
 	
 	fn cairo_device_reference(device: ctypes::intptr_t) -> ctypes::intptr_t;
 	fn cairo_device_destroy(device: ctypes::intptr_t);
@@ -562,7 +571,7 @@ fn format_stride_for_width(format: format, width: uint) -> uint {
 
 const FONT_SLANT_NORMAL: int = 0;
 const FONT_SLANT_ITALIC: int = 1;
-const FONT_SLANT_OBLIQUE: int = 0;
+const FONT_SLANT_OBLIQUE: int = 2;
 
 type font_slant = int;
 
@@ -821,6 +830,36 @@ obj surface(internal: ctypes::intptr_t, res: @surface_res) {
 			}
 		}
 	}
+	fn restrict_to_ps_version(version: str) {
+		alt version {
+			"2" {
+				ccairo::cairo_ps_surface_restrict_to_level(internal, 0 as ctypes::c_int);
+			}
+			"3" {
+				ccairo::cairo_ps_surface_restrict_to_level(internal, 1 as ctypes::c_int);
+			}
+		}
+	}
+	fn set_ps_size(width_in_points: float, height_in_points: float) {
+		ccairo::cairo_ps_surface_set_size(internal, width_in_points, height_in_points);
+	}
+	fn set_ps_encapsulated(eps: bool) {
+		ccairo::cairo_ps_surface_set_eps(internal, (eps ? 1 : 0) as ctypes::c_int);
+	}
+	fn is_ps_encapsulated() -> bool {
+		ret ccairo::cairo_ps_surface_get_eps(internal) == (1 as ctypes::c_int);
+	}
+	fn ps_begin_setup_comments() {
+		ccairo::cairo_ps_surface_dsc_begin_setup(internal);
+	}
+	fn ps_begin_page_setup_comments() {
+		ccairo::cairo_ps_surface_dsc_begin_page_setup(internal);
+	}
+	fn ps_comment(text: str) unsafe {
+		let bytes = core::str::bytes(text);
+		
+		ccairo::cairo_ps_surface_dsc_comment(internal, core::vec::unsafe::to_ptr(bytes));
+	}
 	fn get_image_data() -> [mutable u8] unsafe { // TODO test if this is mutable, as rust might not keep the same pointers but reallocate
 		let data = ccairo::cairo_image_surface_get_data(internal);
 		
@@ -962,6 +1001,17 @@ fn mk_svg_surface(file: str, width_in_points: float, height_in_points: float) ->
 	
 	ret surface(internal, res);
 }
+fn mk_ps_surface(file: str, width_in_points: float, height_in_points: float) -> surface unsafe {
+	let path = std::fs::make_absolute(file);
+	let bytes = core::str::bytes(path);
+	
+	core::vec::push(bytes, 0 as u8);
+	
+	let internal: ctypes::intptr_t = ccairo::cairo_ps_surface_create(core::vec::unsafe::to_ptr(bytes), width_in_points, height_in_points);
+	let res = @surface_res(internal);
+	
+	ret surface(internal, res);
+}
 fn mk_image_surface(format: format, width: uint, height: uint) -> surface {
 	let internal: ctypes::intptr_t = ccairo::cairo_image_surface_create(format as ctypes::c_int, width as ctypes::c_int, height as ctypes::c_int);
 	let res = @surface_res(internal);
@@ -982,12 +1032,12 @@ fn mk_image_surface_from_file(file: str) -> surface unsafe {
 			internal = ccairo::cairo_image_surface_create_from_png(core::vec::unsafe::to_ptr(bytes));
 		}
 		(base, _) {
-			fail;
+			fail "Could not make an image surface from a file due to an unsupported image extension";
 		}
 	}
 	
 	if ccairo::cairo_surface_status(internal) as status != STATUS_SUCCESS {
-		fail;
+		fail "Could not make an image surface from a file";
 	}
 
 	let res = @surface_res(internal);
@@ -1484,18 +1534,18 @@ fn mk_font_face_from_file(file: str) -> font_face unsafe {
 			let library_internal: ctypes::intptr_t = 0 as ctypes::intptr_t;
 
 			if cft::FT_Init_FreeType(core::ptr::addr_of(library_internal)) != (0 as ctypes::c_int) {
-				fail;
+				fail "Could not make a font face from a font file";
 			}
 
 			if cft::FT_New_Face(library_internal, core::vec::unsafe::to_ptr(bytes), 0 as ctypes::long, core::ptr::addr_of(face_internal)) != (0 as ctypes::c_int) {
-				fail;
+				fail "Could not make a font face from a font file";
 			}
 			
 			backend_internal = face_internal;
 			internal = ccairo::cairo_ft_font_face_create_for_ft_face(face_internal, 0 as ctypes::c_int);
 		}
 		(base, _) {
-			fail;
+			fail "Could not make a font face from a font file due to an unsupported font extension";
 		}
 	}
 	
