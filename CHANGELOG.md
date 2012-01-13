@@ -1,3 +1,10 @@
+## v0.2
+
+* Fixed strict type requirements on different architectures.
+* Fixed incorrect values on some constants.
+* Added messages for all failures.
+* Added mk_ps_surface. Same deal as SVG and PDF surfaces, they will be changed in the future so that you use write_to_file rather than providing the file name in the constructor.
+
 ## v0.1.2
 
 * Added freetype support (mk_font_face_from_file("../some/font.ttf")) (will add more backends later, quartz, win32, etc.)
