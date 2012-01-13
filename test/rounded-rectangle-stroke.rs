@@ -3,15 +3,14 @@ use cairo;
 
 const WIDTH: uint = 80u;
 const HEIGHT: uint = 80u;
-const PI: float = 3.141592653589793;
 
 fn rounded_rectangle(context: cairo::context, x: float, y: float, w: float, h: float, r: float)
 {
 	context.new_sub_path();
-	context.arc(x + r, y + r, r, PI, 3.0 * PI / 2.0);
-	context.arc(x + w - r, y + r, r, 3.0 * PI / 2.0, 2.0 * PI);
-	context.arc(x + w - r, y + h - r, r, 0.0, PI / 2.0);
-	context.arc(x + r, y + h - r, r, PI / 2.0, PI);
+	context.arc(x + r, y + r, r, core::f64::consts::pi, 3.0 * core::f64::consts::pi / 2.0);
+	context.arc(x + w - r, y + r, r, 3.0 * core::f64::consts::pi / 2.0, 2.0 * core::f64::consts::pi);
+	context.arc(x + w - r, y + h - r, r, 0.0, core::f64::consts::pi / 2.0);
+	context.arc(x + r, y + h - r, r, core::f64::consts::pi / 2.0, core::f64::consts::pi);
 	context.close_path();
 }
 
