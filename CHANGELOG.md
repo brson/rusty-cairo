@@ -3,7 +3,7 @@
 * Added get_version (gets bindings version) and get_cairo_version (gets internal cairo version).
 * Fixed strict type requirements on different architectures.
 * Fixed incorrect values on some constants.
-* Added messages for all failures.
+* Added messages for all failures. (using status_to_str)
 * Added mk_ps_surface. Same deal as SVG and PDF surfaces, they will be changed in the future so that you use write_to_file rather than providing the file name in the constructor.
 
 ## v0.1.2
