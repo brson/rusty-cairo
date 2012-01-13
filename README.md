@@ -1,6 +1,6 @@
 ## Synopsis
 
-This project contains bindings of the [cairo vector graphics](http://cairographics.org) library to the system programming language [Rust](http://rust-lang.org). This library allows you to draw with vector graphics and then export them as PDFs, SVGs and PDFs. In the future, this library may have a utility for drawing into a GUI window on all operating systems (ie. it would use X11 on linux, Quartz on Mac, Win32 API on Windows, etc). The library also includes loading of TTF fonts via freetype (more backends later on).  
+This project contains bindings of the [cairo vector graphics](http://cairographics.org) library to the system programming language [Rust](http://rust-lang.org). This library allows you to draw with vector graphics and then export them as bitmaps such as PNgs, or export them as vector graphics such as PDFs, SVGs and PS. In the future, this library may have a utility for drawing into a GUI window on all operating systems (ie. it would use X11 on linux, Quartz on Mac, Win32 API on Windows, etc) for making 2d games or visualizations. The library also includes loading of TTF fonts but can fallback to some built-in fonts via cairo's toy font API.  
   
 The following is a very basic example and only touches the power of the cairo library:
 
