@@ -11,6 +11,7 @@ test: all
 	rustc --test -L ./lib ./test/svg.rs -o ./test/svg.elf
 	rustc --test -L ./lib ./test/pdf.rs -o ./test/pdf.elf
 	rustc --test -L ./lib ./test/ps.rs -o ./test/ps.elf
+	rustc --test -L ./lib ./test/png.rs -o ./test/png.elf
 	cd test \
 	&& ./simple.elf \
 	&& ./a1-bug.elf \
@@ -22,6 +23,7 @@ test: all
 	&& ./svg.elf \
 	&& ./pdf.elf \
 	&& ./ps.elf \
+	&& ./png.elf \
 	&& cd ..
 clean:
 	rm -R -f ./lib/*
