@@ -3,7 +3,7 @@ use cairo;
 
 #[test]
 fn test() {
-	let surface: cairo::surface = cairo::mk_ps_surface("svg.ps", 100.0, 100.0);
+	let surface: cairo::surface = cairo::mk_ps_surface("ps.ps", 100.0, 100.0);
 	let context: cairo::context = cairo::mk_context(surface);
 	
 	context.set_source_rgb(0.0, 0.0, 0.0);
