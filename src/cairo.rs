@@ -259,7 +259,7 @@ export
 
 /*
  * FIXME all wrapped objects need to be cached rather than 
- * recreating new objects every time for each **self cairo pointer
+ * recreating new objects every time for each internal cairo pointer
  *
  * TODO more image formats
  
@@ -1353,6 +1353,7 @@ iface matrix {
 	fn scale(x: float, y: float);
 	fn rotate(angle: float);
 	fn invert();
+	fn multiply(other: matrix) -> matrix;
 	fn transform_distance(x: float, y: float) -> (float, float);
 	fn transform_point(x: float, y: float) -> (float, float);
 }
@@ -1405,9 +1406,17 @@ fn wrap_matrix(internal: core::ctypes::intptr_t) -> matrix {
 		fn invert() {
 			ccairo::cairo_matrix_invert(**self);
 		}
-		/*FIXME fn multiply(other: matrix) {
-			ccairo::cairo_matrix_multiply(**self, **self, **other);
-		}*/
+		fn multiply(other: matrix) -> matrix {
+			let result: matrix = mk_matrix([
+				0.0, 0.0,
+				0.0, 0.0,
+				0.0, 0.0
+			]);
+			
+			ccairo::cairo_matrix_multiply(result.get_internal(), **self, other.get_internal());
+			
+			ret result;
+		}
 		fn transform_distance(x: float, y: float) -> (float, float) {
 			let xt: f64 = x;
 			let yt: f64 = y;
@@ -1923,6 +1932,8 @@ iface font_options {
 	
 	fn get_status() -> status;
 	fn hash() -> uint;
+	fn merge(other: font_options);
+	fn equals(other: font_options) -> bool;
 	fn set_antialias(antialias: antialias);
 	fn get_antialias() -> antialias;
 	fn set_subpixel_order(order: subpixel_order);
@@ -1945,13 +1956,15 @@ fn wrap_font_options(internal: core::ctypes::intptr_t) -> font_options {
 		fn get_status() -> status {
 			ret ccairo::cairo_font_options_status(**self) as status;
 		}
-		/* FIXME fn merge(other: font_options) {
-		}*/
+		fn merge(other: font_options) {
+			ccairo::cairo_font_options_merge(**self, other.get_internal());
+		}
 		fn hash() -> uint {
 			ret ccairo::cairo_font_options_hash(**self) as uint;
 		}
-		/* FIXME fn equals(other: font_options) -> bool {
-		}*/
+		fn equals(other: font_options) -> bool {
+			ret ccairo::cairo_font_options_equal(**self, other.get_internal()) == (1 as core::ctypes::c_int);
+		}
 		fn set_antialias(antialias: antialias) {
 			ccairo::cairo_font_options_set_antialias(**self, antialias as core::ctypes::c_int);
 		}
@@ -2101,7 +2114,6 @@ iface context {
 resource context_res(internal: core::ctypes::intptr_t) {
 	ccairo::cairo_destroy(internal);
 }
-
 
 fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 	impl of context for @context_res {

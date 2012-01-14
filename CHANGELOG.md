@@ -1,5 +1,6 @@
 ## v0.2
 
+* Added matrix.multiply(other), font_options.merge(other), font_options.equals(other).
 * Fixed copy_path_flat.
 * Upgraded to implementation and interfaces in Rust, rather than objs (objs are now deprecated).
 * Fixed freetype fonts being cleaned up correctly (valgrind now reports 0 errors).
