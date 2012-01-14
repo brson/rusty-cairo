@@ -3,7 +3,7 @@ use cairo;
 import core::f64::consts;
 
 #[test]
-fn test() {
+fn simple() {
 	let surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, 100u, 100u);
 	let context = cairo::mk_context(surface);
 	

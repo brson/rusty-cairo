@@ -15,7 +15,7 @@ fn rounded_rectangle(context: cairo::context, x: float, y: float, w: float, h: f
 }
 
 #[test]
-fn test() {
+fn rounded_rectangle_stroke() {
 	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, WIDTH, HEIGHT);
 	let context: cairo::context = cairo::mk_context(surface);
 	let widthd: float = WIDTH as float;

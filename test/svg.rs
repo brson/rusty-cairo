@@ -2,7 +2,7 @@ use std;
 use cairo;
 
 #[test]
-fn test() {
+fn svg() {
 	let surface: cairo::surface = cairo::mk_svg_surface("svg.svg", 100.0, 100.0);
 	let context: cairo::context = cairo::mk_context(surface);
 	

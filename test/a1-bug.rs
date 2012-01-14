@@ -5,7 +5,7 @@ const WIDTH: uint = 1000u;
 const HEIGHT: uint = 800u;
 
 #[test]
-fn test() {
+fn a1_bug() {
 	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, WIDTH, HEIGHT);
 	let context: cairo::context = cairo::mk_context(surface);
 	let points: [[float]] = [

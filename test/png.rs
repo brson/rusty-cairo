@@ -2,7 +2,7 @@ use std;
 use cairo;
 
 #[test]
-fn test_b() {
+fn png_b() {
 	let surface: cairo::surface = cairo::mk_image_surface_from_file("png-1.png");
 	let context: cairo::context = cairo::mk_context(surface);
 	
@@ -17,7 +17,7 @@ fn test_b() {
 }
 
 #[test]
-fn test_a() {
+fn png_a() {
 	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, 200u, 100u);
 	let context: cairo::context = cairo::mk_context(surface);
 	

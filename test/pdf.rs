@@ -2,7 +2,7 @@ use std;
 use cairo;
 
 #[test]
-fn test() {
+fn pdf() {
 	let surface: cairo::surface = cairo::mk_pdf_surface("pdf.pdf", 100.0, 100.0);
 	let context: cairo::context = cairo::mk_context(surface);
 	

@@ -30,7 +30,7 @@ fn triangle(context: cairo::context, size: float)
 }
 
 #[test]
-fn test()
+fn shape_sierpinski()
 {
 	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, WIDTH, 2u * HEIGHT);
 	let context: cairo::context = cairo::mk_context(surface);
