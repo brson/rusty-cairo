@@ -2599,7 +2599,7 @@ fn status_to_str(status: status) -> str unsafe {
 	ret core::str::from_cstr(ccairo::cairo_status_to_string(status as core::ctypes::c_int));
 }
 fn get_version() -> str {
-	ret "v0.2";
+	ret "v0.2.1pre";
 }
 fn get_cairo_version() -> str unsafe {
 	ret core::str::from_cstr(ccairo::cairo_version_string());
