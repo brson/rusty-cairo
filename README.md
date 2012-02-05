@@ -12,11 +12,13 @@ You will need the following before you can use this:
 
 ## Download
 
-TODO (when cargo-central is available, there will be a quick way to get this installed and use it in your projects)
+```sh
+cargo install cairo
+```
 
 ## Building and Usage
 
-To build this library, make sure you have all the dependencies. Open up your terminal (if you are on Windows, since Rust only supports MinGW building at the moment, this library uses the GNU building system so you need to use the MinGW terminal) simply `cd` into the directory and type:
+If you want to use the bleeding edge version you will need to build it manually, otherwise you can use cargo-central which is explained above. To build this library, make sure you have all the dependencies. Open up your terminal (if you are on Windows, since Rust only supports MinGW building at the moment, this library uses the GNU building system so you need to use the MinGW terminal) simply `cd` into the directory and type:
 
 ```sh
 make
@@ -27,7 +29,6 @@ The library file will then be built into the `lib` directory (if there were no e
 To then use the library in your project, you use Rust's `use` statement:
 
 ```rust
-use std;
 use cairo;
 ```
 

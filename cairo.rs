@@ -1,7 +1,3 @@
-#[link(name = "cairo", vers = "0.2", author = "Zack0Wack0")];
-#[crate_type = "lib"];
-
-use std;
 import std::{fs, tempfile};
 import core::{ptr, vec, str, ctypes};
 
