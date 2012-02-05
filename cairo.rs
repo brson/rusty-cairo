@@ -909,7 +909,7 @@ fn wrap_surface(internal: core::ctypes::intptr_t) -> surface {
 			ccairo::cairo_ps_surface_set_size(**self, width_in_points, height_in_points);
 		}
 		fn set_ps_encapsulated(eps: bool) {
-			ccairo::cairo_ps_surface_set_eps(**self, (eps ? 1 : 0) as core::ctypes::c_int);
+			ccairo::cairo_ps_surface_set_eps(**self, eps as core::ctypes::c_int);
 		}
 		fn is_ps_encapsulated() -> bool {
 			ret ccairo::cairo_ps_surface_get_eps(**self) == (1 as core::ctypes::c_int);
