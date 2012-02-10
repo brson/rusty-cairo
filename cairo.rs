@@ -1,6 +1,3 @@
-import std::{fs, tempfile};
-import core::{ptr, vec, str, ctypes};
-
 export 
 	get_version,
 	get_cairo_version,
