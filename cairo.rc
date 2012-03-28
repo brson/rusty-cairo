@@ -1,4 +1,4 @@
-#[link(name = "cairo", vers = "0.2.1pre", author = "z0w0", uuid = "df1e437b-e617-48ba-bfc7-b2eef204048f")];
+#[link(name = "cairo", vers = "0.2.1", author = "z0w0", uuid = "df1e437b-e617-48ba-bfc7-b2eef204048f")];
 #[crate_type = "lib"];
 
 use std;
