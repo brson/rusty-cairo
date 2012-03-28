@@ -1,3 +1,8 @@
+## v0.2.1
+
+* Made wrap_* functions available to the public API so that you can supply your own surfaces (such as having your own X11, Win32, etc. surface)
+* Changed all special surface methods to be prefixed to make it consistent
+
 ## v0.2
 
 * Added matrix.multiply(other), font_options.merge(other), font_options.equals(other).
