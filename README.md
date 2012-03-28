@@ -32,8 +32,6 @@ To then use the library in your project, you use Rust's `use` statement:
 use cairo;
 ```
 
-The library currently requires the std module and for some reason rust refuses to import the std module by default when `use cairo;` is called, so using only `use cairo;` throws compile errors.
-
 ## Testing
 
 To run the tests, type in the terminal:
