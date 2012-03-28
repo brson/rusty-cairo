@@ -1,6 +1,3 @@
-import std::{fs, tempfile};
-import core::{ptr, vec, str, ctypes};
-
 export 
 	get_version,
 	get_cairo_version,
@@ -195,6 +192,18 @@ export
 	EXTEND_PAD,
 	extend,
 
+	SVG_VERSION_1_1,
+	SVG_VERSION_1_2,
+	svg_version,
+
+	PDF_VERSION_1_4,
+	PDF_VERSION_1_5,
+	pdf_version,
+
+	PS_VERSION_2,
+	PS_VERSION_3,
+	ps_version,
+
 	FILTER_FAST,
 	FILTER_GOOD,
 	FILTER_BEST,
@@ -210,7 +219,9 @@ export
 	pattern_type,
 
 	device,
+	wrap_device,
 	surface,
+	wrap_surface,
 	mk_surface_from_similar,
 	mk_image_surface,
 	mk_image_surface_from_file,
@@ -220,6 +231,7 @@ export
 	mk_ps_surface,
 
 	pattern,
+	wrap_pattern,
 	mk_pattern_from_rgb,
 	mk_pattern_from_rgba,
 	mk_pattern_from_linear_gradient,
@@ -227,30 +239,40 @@ export
 	mk_pattern_from_surface,
 
 	matrix,
+	wrap_matrix,
 	mk_matrix,
 
 	path,
+	wrap_path,
 
 	glyph,
+	wrap_glyph,
 	mk_glyph,
 
 	text_cluster,
+	wrap_text_cluster,
 	mk_text_cluster,
 
 	font_extents,
+	wrap_font_extents,
 	text_extents,
+	wrap_text_extents,
 
 	font_face,
+	wrap_font_face,
 	mk_font_face_from_toy_font,
 	mk_font_face_from_file,
 
 	scaled_font,
+	wrap_scaled_font,
 
 	font_options,
+	wrap_font_options,
 	mk_font_options,
 	mk_font_options_from_copy,
 
 	context,
+	wrap_context,
 	mk_context;
 
 /*
@@ -748,6 +770,21 @@ type text_cluster_record = {
 	mutable num_glyphs: core::ctypes::c_int
 };
 
+const SVG_VERSION_1_1: int = 0;
+const SVG_VERSION_1_2: int = 1;
+
+type svg_version = int;
+
+const PDF_VERSION_1_4: int = 0;
+const PDF_VERSION_1_5: int = 1;
+
+type pdf_version = int;
+
+const PS_VERSION_2: int = 0;
+const PS_VERSION_3: int = 1;
+
+type ps_version = int;
+
 const DEVICE_TYPE_DRM: int = 0;
 const DEVICE_TYPE_GL: int = 1;
 const DEVICE_TYPE_SCRIPT: int = 2;
@@ -825,27 +862,27 @@ fn wrap_device(internal: core::ctypes::intptr_t) -> device {
 
 iface surface {
 	fn get_internal() -> core::ctypes::intptr_t;
-	
-	fn restrict_to_pdf_version(version: str);
-	fn set_pdf_size(width_in_points: float, height_in_points: float);
-	
-	fn restrict_to_svg_version(version: str);
-	
-	fn restrict_to_ps_version(version: str);
-	fn set_ps_size(width_in_points: float, height_in_points: float);
-	fn set_ps_encapsulated(eps: bool);
-	fn is_ps_encapsulated() -> bool;
+
+	fn pdf_restrict_to_version(version: pdf_version);
+	fn pdf_set_size(width_in_points: float, height_in_points: float);
+
+	fn svg_restrict_to_version(version: svg_version);
+
+	fn ps_restrict_to_version(version: ps_version);
+	fn ps_set_size(width_in_points: float, height_in_points: float);
+	fn ps_set_encapsulated(eps: bool);
+	fn ps_is_encapsulated() -> bool;
 	fn ps_begin_setup_comments();
 	fn ps_begin_page_setup_comments();
 	fn ps_comment(text: str);
-	
-	fn get_image_data() -> [mutable u8];
-	fn get_image_format() -> format;
-	fn get_image_width() -> uint;
-	fn get_image_height() -> uint;
-	fn get_image_stride() -> uint;
-	fn get_image_size() -> (uint, uint);
-	
+
+	fn image_get_data() -> [mutable u8];
+	fn image_get_format() -> format;
+	fn image_get_width() -> uint;
+	fn image_get_height() -> uint;
+	fn image_get_stride() -> uint;
+	fn image_get_size() -> (uint, uint);
+
 	fn write_to_file(file: str) -> status;
 	fn get_status() -> status;
 	fn flush();
@@ -872,46 +909,29 @@ fn wrap_surface(internal: core::ctypes::intptr_t) -> surface {
 			ret **self as core::ctypes::intptr_t;
 		}
 		
-		fn restrict_to_pdf_version(version: str) {
-			alt version {
-				"1.4" {
-					ccairo::cairo_pdf_surface_restrict_to_version(**self, 0 as core::ctypes::c_int);
-				}
-				"1.5" {
-					ccairo::cairo_pdf_surface_restrict_to_version(**self, 1 as core::ctypes::c_int);
-				}
-			}
+		fn pdf_restrict_to_version(version: pdf_version) {
+			ccairo::cairo_pdf_surface_restrict_to_version(**self, version as core::ctypes::c_int);
 		}
-		fn set_pdf_size(width_in_points: float, height_in_points: float) {
+		fn pdf_set_size(width_in_points: float, height_in_points: float) {
 			ccairo::cairo_pdf_surface_set_size(**self, width_in_points, height_in_points);
 		}
-		fn restrict_to_svg_version(version: str) {
-			alt version {
-				"1.1" {
-					ccairo::cairo_svg_surface_restrict_to_version(**self, 0 as core::ctypes::c_int);
-				}
-				"1.2" {
-					ccairo::cairo_svg_surface_restrict_to_version(**self, 1 as core::ctypes::c_int);
-				}
-			}
+		fn svg_restrict_to_version(version: svg_version) {
+			ccairo::cairo_svg_surface_restrict_to_version(**self, version as core::ctypes::c_int);
 		}
-		fn restrict_to_ps_version(version: str) {
-			alt version {
-				"2" {
-					ccairo::cairo_ps_surface_restrict_to_level(**self, 0 as core::ctypes::c_int);
-				}
-				"3" {
-					ccairo::cairo_ps_surface_restrict_to_level(**self, 1 as core::ctypes::c_int);
-				}
-			}
+		fn ps_restrict_to_version(version: ps_version) {
+			ccairo::cairo_ps_surface_restrict_to_level(**self, version as core::ctypes::c_int);
 		}
-		fn set_ps_size(width_in_points: float, height_in_points: float) {
+		fn ps_set_size(width_in_points: float, height_in_points: float) {
 			ccairo::cairo_ps_surface_set_size(**self, width_in_points, height_in_points);
 		}
+<<<<<<< HEAD
 		fn set_ps_encapsulated(eps: bool) {
+=======
+		fn ps_set_encapsulated(eps: bool) {
+>>>>>>> v0.2.1
 			ccairo::cairo_ps_surface_set_eps(**self, eps as core::ctypes::c_int);
 		}
-		fn is_ps_encapsulated() -> bool {
+		fn ps_is_encapsulated() -> bool {
 			ret ccairo::cairo_ps_surface_get_eps(**self) == (1 as core::ctypes::c_int);
 		}
 		fn ps_begin_setup_comments() {
@@ -925,25 +945,25 @@ fn wrap_surface(internal: core::ctypes::intptr_t) -> surface {
 		
 			ccairo::cairo_ps_surface_dsc_comment(**self, core::vec::unsafe::to_ptr(bytes));
 		}
-		fn get_image_data() -> [mutable u8] unsafe { // TODO test if this is mutable, as rust might not keep the same pointers but reallocate
+		fn image_get_data() -> [mutable u8] unsafe { // TODO test if this is mutable, as rust might not keep the same pointers but reallocate
 			let data = ccairo::cairo_image_surface_get_data(**self); // FIXME boxed free
 		
-			ret core::vec::to_mut(core::vec::unsafe::from_buf(data, self.get_image_stride() * self.get_image_height()));
+			ret core::vec::to_mut(core::vec::unsafe::from_buf(data, self.image_get_stride() * self.image_get_height()));
 		}
-		fn get_image_format() -> format {
+		fn image_get_format() -> format {
 			ret ccairo::cairo_image_surface_get_format(**self) as format;
 		}
-		fn get_image_width() -> uint {
+		fn image_get_width() -> uint {
 			ret ccairo::cairo_image_surface_get_width(**self) as uint;
 		}
-		fn get_image_height() -> uint {
+		fn image_get_height() -> uint {
 			ret ccairo::cairo_image_surface_get_height(**self) as uint;
 		}
-		fn get_image_stride() -> uint {
+		fn image_get_stride() -> uint {
 			ret ccairo::cairo_image_surface_get_stride(**self) as uint;
 		}
-		fn get_image_size() -> (uint, uint) {
-			ret (self.get_image_width(), self.get_image_height());
+		fn image_get_size() -> (uint, uint) {
+			ret (self.image_get_width(), self.image_get_height());
 		}
 
 		fn write_to_file(file: str) -> status unsafe {
@@ -2599,7 +2619,7 @@ fn status_to_str(status: status) -> str unsafe {
 	ret core::str::from_cstr(ccairo::cairo_status_to_string(status as core::ctypes::c_int));
 }
 fn get_version() -> str {
-	ret "v0.2";
+	ret "v0.2.1pre";
 }
 fn get_cairo_version() -> str unsafe {
 	ret core::str::from_cstr(ccairo::cairo_version_string());

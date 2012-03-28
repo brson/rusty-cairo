@@ -22,8 +22,8 @@ fn png() {
 	context.fill();
 	
 	assert context.get_status() == cairo::STATUS_SUCCESS;
-	assert surface.get_image_width() == 200u;
-	assert surface.get_image_height() == 100u;
+	assert surface.image_get_width() == 200u;
+	assert surface.image_get_height() == 100u;
 	assert surface.write_to_file("png-2.png") == cairo::STATUS_SUCCESS;
 	
 	surface.flush();
