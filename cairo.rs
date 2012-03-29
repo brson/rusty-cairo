@@ -293,265 +293,265 @@ export
 #[nolink]
 #[abi = "cdecl"]
 native mod c {
-	fn fopen(path: *u8, mode: *u8) -> core::ctypes::intptr_t;
-	fn fclose(file: core::ctypes::intptr_t);
+	fn fopen(path: *u8, mode: *u8) -> core::libc::intptr_t;
+	fn fclose(file: core::libc::intptr_t);
 }
 
 #[link_name = "freetype"]
 #[abi = "cdecl"]
 native mod cft {
-	fn FT_Init_FreeType(library: *core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn FT_New_Face(library: core::ctypes::intptr_t, path: *u8, offset: core::ctypes::long, face: *core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn FT_Done_Face(face: core::ctypes::intptr_t);
-	fn FT_Done_FreeType(face: core::ctypes::intptr_t);
+	fn FT_Init_FreeType(library: *core::libc::intptr_t) -> core::libc::c_int;
+	fn FT_New_Face(library: core::libc::intptr_t, path: *u8, offset: core::libc::c_long, face: *core::libc::intptr_t) -> core::libc::c_int;
+	fn FT_Done_Face(face: core::libc::intptr_t);
+	fn FT_Done_FreeType(face: core::libc::intptr_t);
 }
 
 #[link_name = "cairo"]
 #[abi = "cdecl"]
 native mod ccairo {
-	fn cairo_ft_font_face_create_for_ft_face(ft_face: core::ctypes::intptr_t, flags: core::ctypes::c_int) -> core::ctypes::intptr_t;
-	fn cairo_font_face_set_user_data(face: core::ctypes::intptr_t, key: core::ctypes::intptr_t, ft_face: core::ctypes::intptr_t, cb: core::ctypes::intptr_t);	
+	fn cairo_ft_font_face_create_for_ft_face(ft_face: core::libc::intptr_t, flags: core::libc::c_int) -> core::libc::intptr_t;
+	fn cairo_font_face_set_user_data(face: core::libc::intptr_t, key: core::libc::intptr_t, ft_face: core::libc::intptr_t, cb: core::libc::intptr_t);	
 
-	fn cairo_version_string() -> *u8;
-	fn cairo_create(surface: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_reference(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_destroy(context: core::ctypes::intptr_t);
-	fn cairo_status(context: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_save(context: core::ctypes::intptr_t);
-	fn cairo_restore(context: core::ctypes::intptr_t);
-	fn cairo_get_target(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_push_group(context: core::ctypes::intptr_t);
-	fn cairo_push_group_with_content(context: core::ctypes::intptr_t, content: core::ctypes::c_int);
-	fn cairo_pop_group(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_pop_group_to_source(context: core::ctypes::intptr_t);
-	fn cairo_get_group_target(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_set_source_rgb(context: core::ctypes::intptr_t, red: f64, green: f64, blue: f64);
-	fn cairo_set_source_rgba(context: core::ctypes::intptr_t, red: f64, green: f64, blue: f64, alpha: f64);
-	fn cairo_set_source(context: core::ctypes::intptr_t, pattern: core::ctypes::intptr_t);
-	fn cairo_set_source_surface(context: core::ctypes::intptr_t, surface: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_get_source(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_set_antialias(context: core::ctypes::intptr_t, antialias: core::ctypes::c_int);
-	fn cairo_get_antialias(context: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_set_dash(context: core::ctypes::intptr_t, dashes: *f64, num_dashes: core::ctypes::c_int, offset: f64);
-	fn cairo_get_dash_count(context: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_get_dash(context: core::ctypes::intptr_t, dashes: *f64, offset: *f64);
-	fn cairo_set_fill_rule(context: core::ctypes::intptr_t, rule: core::ctypes::c_int);
-	fn cairo_get_fill_rule(context: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_set_line_cap(context: core::ctypes::intptr_t, cap: core::ctypes::c_int);
-	fn cairo_get_line_cap(context: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_set_line_join(context: core::ctypes::intptr_t, join: core::ctypes::c_int);
-	fn cairo_get_line_join(context: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_set_line_width(context: core::ctypes::intptr_t, width: f64);
-	fn cairo_get_line_width(context: core::ctypes::intptr_t) -> f64;
-	fn cairo_set_miter_limit(context: core::ctypes::intptr_t, limit: f64);
-	fn cairo_get_miter_limit(context: core::ctypes::intptr_t) -> f64;
-	fn cairo_set_operator(context: core::ctypes::intptr_t, join: core::ctypes::c_int);
-	fn cairo_get_operator(context: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_set_tolerance(context: core::ctypes::intptr_t, limit: f64);
-	fn cairo_get_tolerance(context: core::ctypes::intptr_t) -> f64;
-	fn cairo_clip(context: core::ctypes::intptr_t);
-	fn cairo_clip_preserve(context: core::ctypes::intptr_t);
-	fn cairo_clip_extents(context: core::ctypes::intptr_t, x1: *f64, y1: *f64, x2: *f64, y2: *f64);
-	fn cairo_in_clip(context: core::ctypes::intptr_t, x: f64, y: f64) -> core::ctypes::c_int;
-	fn cairo_reset_clip(context: core::ctypes::intptr_t);
-	fn cairo_fill(context: core::ctypes::intptr_t);
-	fn cairo_fill_preserve(context: core::ctypes::intptr_t);
-	fn cairo_fill_extents(context: core::ctypes::intptr_t, x1: *f64, y1: *f64, x2: *f64, y2: *f64);
-	fn cairo_in_fill(context: core::ctypes::intptr_t, x: f64, y: f64) -> core::ctypes::c_int;
-	fn cairo_mask(context: core::ctypes::intptr_t, pattern: core::ctypes::intptr_t);
-	fn cairo_mask_surface(context: core::ctypes::intptr_t, surface: core::ctypes::intptr_t, surface_x: f64, surface_y: f64);
-	fn cairo_paint(context: core::ctypes::intptr_t);
-	fn cairo_paint_with_alpha(context: core::ctypes::intptr_t, alpha: f64);
-	fn cairo_stroke(context: core::ctypes::intptr_t);
-	fn cairo_stroke_preserve(context: core::ctypes::intptr_t);
-	fn cairo_stroke_extents(context: core::ctypes::intptr_t, x1: *f64, y1: *f64, x2: *f64, y2: *f64);
-	fn cairo_in_stroke(context: core::ctypes::intptr_t, x: f64, y: f64) -> core::ctypes::c_int;
-	fn cairo_copy_page(context: core::ctypes::intptr_t);
-	fn cairo_show_page(context: core::ctypes::intptr_t);
-	fn cairo_get_reference_count(context: core::ctypes::intptr_t) -> core::ctypes::c_uint;
+	fn cairo_version_string() -> *libc::c_char;
+	fn cairo_create(surface: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_reference(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_destroy(context: core::libc::intptr_t);
+	fn cairo_status(context: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_save(context: core::libc::intptr_t);
+	fn cairo_restore(context: core::libc::intptr_t);
+	fn cairo_get_target(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_push_group(context: core::libc::intptr_t);
+	fn cairo_push_group_with_content(context: core::libc::intptr_t, content: core::libc::c_int);
+	fn cairo_pop_group(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_pop_group_to_source(context: core::libc::intptr_t);
+	fn cairo_get_group_target(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_set_source_rgb(context: core::libc::intptr_t, red: f64, green: f64, blue: f64);
+	fn cairo_set_source_rgba(context: core::libc::intptr_t, red: f64, green: f64, blue: f64, alpha: f64);
+	fn cairo_set_source(context: core::libc::intptr_t, pattern: core::libc::intptr_t);
+	fn cairo_set_source_surface(context: core::libc::intptr_t, surface: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_get_source(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_set_antialias(context: core::libc::intptr_t, antialias: core::libc::c_int);
+	fn cairo_get_antialias(context: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_set_dash(context: core::libc::intptr_t, dashes: *f64, num_dashes: core::libc::c_int, offset: f64);
+	fn cairo_get_dash_count(context: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_get_dash(context: core::libc::intptr_t, dashes: *f64, offset: *f64);
+	fn cairo_set_fill_rule(context: core::libc::intptr_t, rule: core::libc::c_int);
+	fn cairo_get_fill_rule(context: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_set_line_cap(context: core::libc::intptr_t, cap: core::libc::c_int);
+	fn cairo_get_line_cap(context: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_set_line_join(context: core::libc::intptr_t, join: core::libc::c_int);
+	fn cairo_get_line_join(context: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_set_line_width(context: core::libc::intptr_t, width: f64);
+	fn cairo_get_line_width(context: core::libc::intptr_t) -> f64;
+	fn cairo_set_miter_limit(context: core::libc::intptr_t, limit: f64);
+	fn cairo_get_miter_limit(context: core::libc::intptr_t) -> f64;
+	fn cairo_set_operator(context: core::libc::intptr_t, join: core::libc::c_int);
+	fn cairo_get_operator(context: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_set_tolerance(context: core::libc::intptr_t, limit: f64);
+	fn cairo_get_tolerance(context: core::libc::intptr_t) -> f64;
+	fn cairo_clip(context: core::libc::intptr_t);
+	fn cairo_clip_preserve(context: core::libc::intptr_t);
+	fn cairo_clip_extents(context: core::libc::intptr_t, x1: *f64, y1: *f64, x2: *f64, y2: *f64);
+	fn cairo_in_clip(context: core::libc::intptr_t, x: f64, y: f64) -> core::libc::c_int;
+	fn cairo_reset_clip(context: core::libc::intptr_t);
+	fn cairo_fill(context: core::libc::intptr_t);
+	fn cairo_fill_preserve(context: core::libc::intptr_t);
+	fn cairo_fill_extents(context: core::libc::intptr_t, x1: *f64, y1: *f64, x2: *f64, y2: *f64);
+	fn cairo_in_fill(context: core::libc::intptr_t, x: f64, y: f64) -> core::libc::c_int;
+	fn cairo_mask(context: core::libc::intptr_t, pattern: core::libc::intptr_t);
+	fn cairo_mask_surface(context: core::libc::intptr_t, surface: core::libc::intptr_t, surface_x: f64, surface_y: f64);
+	fn cairo_paint(context: core::libc::intptr_t);
+	fn cairo_paint_with_alpha(context: core::libc::intptr_t, alpha: f64);
+	fn cairo_stroke(context: core::libc::intptr_t);
+	fn cairo_stroke_preserve(context: core::libc::intptr_t);
+	fn cairo_stroke_extents(context: core::libc::intptr_t, x1: *f64, y1: *f64, x2: *f64, y2: *f64);
+	fn cairo_in_stroke(context: core::libc::intptr_t, x: f64, y: f64) -> core::libc::c_int;
+	fn cairo_copy_page(context: core::libc::intptr_t);
+	fn cairo_show_page(context: core::libc::intptr_t);
+	fn cairo_get_reference_count(context: core::libc::intptr_t) -> core::libc::c_uint;
 	
-	fn cairo_translate(context: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_scale(context: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_rotate(context: core::ctypes::intptr_t, angle: f64);
-	fn cairo_transform(context: core::ctypes::intptr_t, matrix: core::ctypes::intptr_t);
-	fn cairo_set_matrix(context: core::ctypes::intptr_t, matrix: core::ctypes::intptr_t);
-	fn cairo_get_matrix(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_identity_matrix(context: core::ctypes::intptr_t);
-	fn cairo_user_to_device(context: core::ctypes::intptr_t, x: *f64, y: *f64);
-	fn cairo_user_to_device_distance(context: core::ctypes::intptr_t, x: *f64, y: *f64);
-	fn cairo_device_to_user(context: core::ctypes::intptr_t, x: *f64, y: *f64);
-	fn cairo_device_to_user_distance(context: core::ctypes::intptr_t, x: *f64, y: *f64);
+	fn cairo_translate(context: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_scale(context: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_rotate(context: core::libc::intptr_t, angle: f64);
+	fn cairo_transform(context: core::libc::intptr_t, matrix: core::libc::intptr_t);
+	fn cairo_set_matrix(context: core::libc::intptr_t, matrix: core::libc::intptr_t);
+	fn cairo_get_matrix(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_identity_matrix(context: core::libc::intptr_t);
+	fn cairo_user_to_device(context: core::libc::intptr_t, x: *f64, y: *f64);
+	fn cairo_user_to_device_distance(context: core::libc::intptr_t, x: *f64, y: *f64);
+	fn cairo_device_to_user(context: core::libc::intptr_t, x: *f64, y: *f64);
+	fn cairo_device_to_user_distance(context: core::libc::intptr_t, x: *f64, y: *f64);
 	
-	fn cairo_copy_path(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_copy_path_flat(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_path_destroy(path: core::ctypes::intptr_t);
-	fn cairo_append_path(context: core::ctypes::intptr_t, path: core::ctypes::intptr_t);
-	fn cairo_has_current_point(context: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_get_current_point(context: core::ctypes::intptr_t, x: *f64, y: *f64);
-	fn cairo_new_path(context: core::ctypes::intptr_t);
-	fn cairo_new_sub_path(context: core::ctypes::intptr_t);
-	fn cairo_close_path(context: core::ctypes::intptr_t);
-	fn cairo_arc(context: core::ctypes::intptr_t, x: f64, y: f64, radius: f64, angle1: f64, angle2: f64);
-	fn cairo_arc_negative(context: core::ctypes::intptr_t, x: f64, y: f64, radius: f64, angle1: f64, angle2: f64);
-	fn cairo_curve_to(context: core::ctypes::intptr_t, x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64);
-	fn cairo_line_to(context: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_move_to(context: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_rectangle(context: core::ctypes::intptr_t, x: f64, y: f64, width: f64, height: f64);
-	fn cairo_glyph_path(context: core::ctypes::intptr_t, glyph: core::ctypes::intptr_t, num_glyphs: core::ctypes::c_int);
-	fn cairo_text_path(context: core::ctypes::intptr_t, text: *u8);
-	fn cairo_rel_curve_to(context: core::ctypes::intptr_t, x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64);
-	fn cairo_rel_line_to(context: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_rel_move_to(context: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_path_extents(context: core::ctypes::intptr_t, x1: *f64, y1: *f64, x2: *f64, y2: *f64);
+	fn cairo_copy_path(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_copy_path_flat(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_path_destroy(path: core::libc::intptr_t);
+	fn cairo_append_path(context: core::libc::intptr_t, path: core::libc::intptr_t);
+	fn cairo_has_current_point(context: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_get_current_point(context: core::libc::intptr_t, x: *f64, y: *f64);
+	fn cairo_new_path(context: core::libc::intptr_t);
+	fn cairo_new_sub_path(context: core::libc::intptr_t);
+	fn cairo_close_path(context: core::libc::intptr_t);
+	fn cairo_arc(context: core::libc::intptr_t, x: f64, y: f64, radius: f64, angle1: f64, angle2: f64);
+	fn cairo_arc_negative(context: core::libc::intptr_t, x: f64, y: f64, radius: f64, angle1: f64, angle2: f64);
+	fn cairo_curve_to(context: core::libc::intptr_t, x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64);
+	fn cairo_line_to(context: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_move_to(context: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_rectangle(context: core::libc::intptr_t, x: f64, y: f64, width: f64, height: f64);
+	fn cairo_glyph_path(context: core::libc::intptr_t, glyph: core::libc::intptr_t, num_glyphs: core::libc::c_int);
+	fn cairo_text_path(context: core::libc::intptr_t, text: *u8);
+	fn cairo_rel_curve_to(context: core::libc::intptr_t, x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64);
+	fn cairo_rel_line_to(context: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_rel_move_to(context: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_path_extents(context: core::libc::intptr_t, x1: *f64, y1: *f64, x2: *f64, y2: *f64);
 	
-	fn cairo_select_font_face(context: core::ctypes::intptr_t, face: *u8, slant: core::ctypes::c_int, weight: core::ctypes::c_int);
-	fn cairo_set_font_size(context: core::ctypes::intptr_t, size: f64);
-	fn cairo_set_font_matrix(context: core::ctypes::intptr_t, matrix: core::ctypes::intptr_t);
-	fn cairo_get_font_matrix(context: core::ctypes::intptr_t, matrix: *core::ctypes::intptr_t);
-	fn cairo_set_font_options(context: core::ctypes::intptr_t, options: core::ctypes::intptr_t);
-	fn cairo_get_font_options(context: core::ctypes::intptr_t, options: *core::ctypes::intptr_t);
-	fn cairo_set_font_face(context: core::ctypes::intptr_t, face: core::ctypes::intptr_t);
-	fn cairo_get_font_face(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_set_scaled_font(context: core::ctypes::intptr_t, font: core::ctypes::intptr_t);
-	fn cairo_get_scaled_font(context: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_show_text(context: core::ctypes::intptr_t, text: *u8);
-	fn cairo_show_glyphs(context: core::ctypes::intptr_t, glyphs: core::ctypes::intptr_t, num_glyphs: core::ctypes::c_int);
-	fn cairo_show_text_glyphs(context: core::ctypes::intptr_t, text: *u8, text_len: core::ctypes::c_int, glyphs: core::ctypes::intptr_t, num_glyphs: core::ctypes::c_int, clusters: core::ctypes::intptr_t, num_clusters: core::ctypes::c_int, cluster_flags: core::ctypes::c_int);
-	fn cairo_font_extents(context: core::ctypes::intptr_t, extents: core::ctypes::intptr_t);
-	fn cairo_text_extents(context: core::ctypes::intptr_t, text: *u8, extents: core::ctypes::intptr_t);
-	fn cairo_glyph_extents(context: core::ctypes::intptr_t, glyphs: core::ctypes::intptr_t, num_glyphs: core::ctypes::c_int, extents: core::ctypes::intptr_t);
-	fn cairo_toy_font_face_create(family: *u8, slant: core::ctypes::c_int, weight: core::ctypes::c_int) -> core::ctypes::intptr_t;
-	fn cairo_toy_font_face_get_family(face: core::ctypes::intptr_t) -> *u8;
-	fn cairo_toy_font_face_get_slant(face: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_toy_font_face_get_weight(face: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_glyph_allocate(num_glyphs: core::ctypes::c_int) -> core::ctypes::intptr_t;
-	fn cairo_glyph_free(glyphs: core::ctypes::intptr_t);
-	fn cairo_text_cluster_allocate(num_clusters: core::ctypes::c_int) -> core::ctypes::intptr_t;
-	fn cairo_text_cluster_free(clusters: core::ctypes::intptr_t);
+	fn cairo_select_font_face(context: core::libc::intptr_t, face: *u8, slant: core::libc::c_int, weight: core::libc::c_int);
+	fn cairo_set_font_size(context: core::libc::intptr_t, size: f64);
+	fn cairo_set_font_matrix(context: core::libc::intptr_t, matrix: core::libc::intptr_t);
+	fn cairo_get_font_matrix(context: core::libc::intptr_t, matrix: *core::libc::intptr_t);
+	fn cairo_set_font_options(context: core::libc::intptr_t, options: core::libc::intptr_t);
+	fn cairo_get_font_options(context: core::libc::intptr_t, options: *core::libc::intptr_t);
+	fn cairo_set_font_face(context: core::libc::intptr_t, face: core::libc::intptr_t);
+	fn cairo_get_font_face(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_set_scaled_font(context: core::libc::intptr_t, font: core::libc::intptr_t);
+	fn cairo_get_scaled_font(context: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_show_text(context: core::libc::intptr_t, text: *u8);
+	fn cairo_show_glyphs(context: core::libc::intptr_t, glyphs: core::libc::intptr_t, num_glyphs: core::libc::c_int);
+	fn cairo_show_text_glyphs(context: core::libc::intptr_t, text: *u8, text_len: core::libc::c_int, glyphs: core::libc::intptr_t, num_glyphs: core::libc::c_int, clusters: core::libc::intptr_t, num_clusters: core::libc::c_int, cluster_flags: core::libc::c_int);
+	fn cairo_font_extents(context: core::libc::intptr_t, extents: core::libc::intptr_t);
+	fn cairo_text_extents(context: core::libc::intptr_t, text: *u8, extents: core::libc::intptr_t);
+	fn cairo_glyph_extents(context: core::libc::intptr_t, glyphs: core::libc::intptr_t, num_glyphs: core::libc::c_int, extents: core::libc::intptr_t);
+	fn cairo_toy_font_face_create(family: *u8, slant: core::libc::c_int, weight: core::libc::c_int) -> core::libc::intptr_t;
+	fn cairo_toy_font_face_get_family(face: core::libc::intptr_t) -> *libc::c_char;
+	fn cairo_toy_font_face_get_slant(face: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_toy_font_face_get_weight(face: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_glyph_allocate(num_glyphs: core::libc::c_int) -> core::libc::intptr_t;
+	fn cairo_glyph_free(glyphs: core::libc::intptr_t);
+	fn cairo_text_cluster_allocate(num_clusters: core::libc::c_int) -> core::libc::intptr_t;
+	fn cairo_text_cluster_free(clusters: core::libc::intptr_t);
 	
-	fn cairo_font_options_create() -> core::ctypes::intptr_t;
-	fn cairo_font_options_copy(options: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_font_options_destroy(options: core::ctypes::intptr_t);
-	fn cairo_font_options_status(options: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_font_options_merge(options: core::ctypes::intptr_t, other: core::ctypes::intptr_t);
-	fn cairo_font_options_hash(options: core::ctypes::intptr_t) -> core::ctypes::ulong;
-	fn cairo_font_options_equal(options: core::ctypes::intptr_t, other: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_font_options_set_antialias(options: core::ctypes::intptr_t, value: core::ctypes::c_int);
-	fn cairo_font_options_get_antialias(options: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_font_options_set_subpixel_order(options: core::ctypes::intptr_t, value: core::ctypes::c_int);
-	fn cairo_font_options_get_subpixel_order(options: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_font_options_set_hint_style(options: core::ctypes::intptr_t, value: core::ctypes::c_int);
-	fn cairo_font_options_get_hint_style(options: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_font_options_set_hint_metrics(options: core::ctypes::intptr_t, value: core::ctypes::c_int);
-	fn cairo_font_options_get_hint_metrics(options: core::ctypes::intptr_t) -> core::ctypes::c_int;
+	fn cairo_font_options_create() -> core::libc::intptr_t;
+	fn cairo_font_options_copy(options: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_font_options_destroy(options: core::libc::intptr_t);
+	fn cairo_font_options_status(options: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_font_options_merge(options: core::libc::intptr_t, other: core::libc::intptr_t);
+	fn cairo_font_options_hash(options: core::libc::intptr_t) -> core::libc::c_ulong;
+	fn cairo_font_options_equal(options: core::libc::intptr_t, other: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_font_options_set_antialias(options: core::libc::intptr_t, value: core::libc::c_int);
+	fn cairo_font_options_get_antialias(options: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_font_options_set_subpixel_order(options: core::libc::intptr_t, value: core::libc::c_int);
+	fn cairo_font_options_get_subpixel_order(options: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_font_options_set_hint_style(options: core::libc::intptr_t, value: core::libc::c_int);
+	fn cairo_font_options_get_hint_style(options: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_font_options_set_hint_metrics(options: core::libc::intptr_t, value: core::libc::c_int);
+	fn cairo_font_options_get_hint_metrics(options: core::libc::intptr_t) -> core::libc::c_int;
 	
-	fn cairo_font_face_reference(face: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_font_face_destroy(face: core::ctypes::intptr_t);
-	fn cairo_font_face_status(face: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_font_face_get_type(face: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_font_face_get_reference_count(face: core::ctypes::intptr_t) -> core::ctypes::c_uint;
+	fn cairo_font_face_reference(face: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_font_face_destroy(face: core::libc::intptr_t);
+	fn cairo_font_face_status(face: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_font_face_get_type(face: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_font_face_get_reference_count(face: core::libc::intptr_t) -> core::libc::c_uint;
 	
-	fn cairo_scaled_font_destroy(font: core::ctypes::intptr_t);
-	fn cairo_scaled_font_get_reference_count(font: core::ctypes::intptr_t) -> core::ctypes::c_uint;
-	fn cairo_scaled_font_reference(font: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_scaled_font_get_type(font: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_scaled_font_get_scale_matrix(font: core::ctypes::intptr_t, matrix: core::ctypes::intptr_t);
-	fn cairo_scaled_font_get_ctm(font: core::ctypes::intptr_t, matrix: core::ctypes::intptr_t);
-	fn cairo_scaled_font_get_font_matrix(font: core::ctypes::intptr_t, matrix: core::ctypes::intptr_t);
-	fn cairo_scaled_font_get_font_options(font: core::ctypes::intptr_t, options: core::ctypes::intptr_t);
-	fn cairo_scaled_font_get_font_face(font: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_scaled_font_extents(font: core::ctypes::intptr_t, extents: core::ctypes::intptr_t);
-	fn cairo_scaled_font_text_extents(font: core::ctypes::intptr_t, text: *u8, extents: core::ctypes::intptr_t);
-	fn cairo_scaled_font_glyph_extents(font: core::ctypes::intptr_t, glyphs: core::ctypes::intptr_t, num_glyphs: core::ctypes::c_int, extents: core::ctypes::intptr_t);
-	fn cairo_scaled_font_status(font: core::ctypes::intptr_t) -> core::ctypes::c_int;
+	fn cairo_scaled_font_destroy(font: core::libc::intptr_t);
+	fn cairo_scaled_font_get_reference_count(font: core::libc::intptr_t) -> core::libc::c_uint;
+	fn cairo_scaled_font_reference(font: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_scaled_font_get_type(font: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_scaled_font_get_scale_matrix(font: core::libc::intptr_t, matrix: core::libc::intptr_t);
+	fn cairo_scaled_font_get_ctm(font: core::libc::intptr_t, matrix: core::libc::intptr_t);
+	fn cairo_scaled_font_get_font_matrix(font: core::libc::intptr_t, matrix: core::libc::intptr_t);
+	fn cairo_scaled_font_get_font_options(font: core::libc::intptr_t, options: core::libc::intptr_t);
+	fn cairo_scaled_font_get_font_face(font: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_scaled_font_extents(font: core::libc::intptr_t, extents: core::libc::intptr_t);
+	fn cairo_scaled_font_text_extents(font: core::libc::intptr_t, text: *u8, extents: core::libc::intptr_t);
+	fn cairo_scaled_font_glyph_extents(font: core::libc::intptr_t, glyphs: core::libc::intptr_t, num_glyphs: core::libc::c_int, extents: core::libc::intptr_t);
+	fn cairo_scaled_font_status(font: core::libc::intptr_t) -> core::libc::c_int;
 	
-	fn cairo_matrix_init(matrix: core::ctypes::intptr_t, xx: f64, xy: f64, yx: f64, yy: f64, x0: f64, y0: f64);
-	fn cairo_matrix_init_identity(matrix: core::ctypes::intptr_t);
-	fn cairo_matrix_init_translate(matrix: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_matrix_init_scale(matrix: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_matrix_init_rotate(matrix: core::ctypes::intptr_t, angle: f64);
-	fn cairo_matrix_translate(matrix: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_matrix_scale(matrix: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_matrix_rotate(matrix: core::ctypes::intptr_t, angle: f64);
-	fn cairo_matrix_invert(matrix: core::ctypes::intptr_t);
-	fn cairo_matrix_multiply(matrix: core::ctypes::intptr_t, left: core::ctypes::intptr_t, right: core::ctypes::intptr_t);
-	fn cairo_matrix_transform_distance(matrix: core::ctypes::intptr_t, x: *f64, y: *f64);
-	fn cairo_matrix_transform_point(matrix: core::ctypes::intptr_t, x: *f64, y: *f64);
+	fn cairo_matrix_init(matrix: core::libc::intptr_t, xx: f64, xy: f64, yx: f64, yy: f64, x0: f64, y0: f64);
+	fn cairo_matrix_init_identity(matrix: core::libc::intptr_t);
+	fn cairo_matrix_init_translate(matrix: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_matrix_init_scale(matrix: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_matrix_init_rotate(matrix: core::libc::intptr_t, angle: f64);
+	fn cairo_matrix_translate(matrix: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_matrix_scale(matrix: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_matrix_rotate(matrix: core::libc::intptr_t, angle: f64);
+	fn cairo_matrix_invert(matrix: core::libc::intptr_t);
+	fn cairo_matrix_multiply(matrix: core::libc::intptr_t, left: core::libc::intptr_t, right: core::libc::intptr_t);
+	fn cairo_matrix_transform_distance(matrix: core::libc::intptr_t, x: *f64, y: *f64);
+	fn cairo_matrix_transform_point(matrix: core::libc::intptr_t, x: *f64, y: *f64);
 	
-	fn cairo_pattern_destroy(pattern: core::ctypes::intptr_t);
-	fn cairo_pattern_reference(pattern: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_pattern_create_rgb(red: f64, blue: f64, green: f64) -> core::ctypes::intptr_t;
-	fn cairo_pattern_create_rgba(red: f64, blue: f64, green: f64, alpha: f64) -> core::ctypes::intptr_t;
-	fn cairo_pattern_create_linear(x0: f64, y0: f64, x1: f64, y1: f64) -> core::ctypes::intptr_t;
-	fn cairo_pattern_create_radial(cx0: f64, cy0: f64, radius0: f64, cx1: f64, cy1: f64, radius1: f64) -> core::ctypes::intptr_t;
-	fn cairo_pattern_create_for_surface(pattern: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_pattern_get_type(pattern: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_pattern_get_matrix(pattern: core::ctypes::intptr_t, matrix: core::ctypes::intptr_t);
-	fn cairo_pattern_set_matrix(pattern: core::ctypes::intptr_t, matrix: core::ctypes::intptr_t);
-	fn cairo_pattern_get_filter(pattern: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_pattern_set_filter(pattern: core::ctypes::intptr_t, filter: core::ctypes::c_int);
-	fn cairo_pattern_get_extend(pattern: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_pattern_set_extend(pattern: core::ctypes::intptr_t, extend: core::ctypes::c_int);
-	fn cairo_pattern_status(pattern: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_pattern_get_color_stop_count(pattern: core::ctypes::intptr_t, count: *core::ctypes::c_int);
-	fn cairo_pattern_get_surface(pattern: core::ctypes::intptr_t, surface: *core::ctypes::intptr_t);
-	fn cairo_pattern_add_color_stop_rgb(pattern: core::ctypes::intptr_t, offset: f64, red: f64, green: f64, blue: f64);
-	fn cairo_pattern_add_color_stop_rgba(pattern: core::ctypes::intptr_t, offset: f64, red: f64, green: f64, blue: f64, alpha: f64);
-	fn cairo_pattern_get_color_stop_rgba(pattern: core::ctypes::intptr_t, index: core::ctypes::c_int, offset: *f64, red: *f64, green: *f64, blue: *f64, alpha: *f64);
-	fn cairo_pattern_get_rgba(pattern: core::ctypes::intptr_t, red: *f64, green: *f64, blue: *f64, alpha: *f64);
-	fn cairo_pattern_get_linear_points(pattern: core::ctypes::intptr_t, x0: *f64, y0: *f64, x1: *f64, y1: *f64);
-	fn cairo_pattern_get_radial_circles(pattern: core::ctypes::intptr_t, cx0: *f64, cy0: *f64, radius0: *f64, cx1: *f64, cy1: *f64, radius1: *f64);
+	fn cairo_pattern_destroy(pattern: core::libc::intptr_t);
+	fn cairo_pattern_reference(pattern: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_pattern_create_rgb(red: f64, blue: f64, green: f64) -> core::libc::intptr_t;
+	fn cairo_pattern_create_rgba(red: f64, blue: f64, green: f64, alpha: f64) -> core::libc::intptr_t;
+	fn cairo_pattern_create_linear(x0: f64, y0: f64, x1: f64, y1: f64) -> core::libc::intptr_t;
+	fn cairo_pattern_create_radial(cx0: f64, cy0: f64, radius0: f64, cx1: f64, cy1: f64, radius1: f64) -> core::libc::intptr_t;
+	fn cairo_pattern_create_for_surface(pattern: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_pattern_get_type(pattern: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_pattern_get_matrix(pattern: core::libc::intptr_t, matrix: core::libc::intptr_t);
+	fn cairo_pattern_set_matrix(pattern: core::libc::intptr_t, matrix: core::libc::intptr_t);
+	fn cairo_pattern_get_filter(pattern: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_pattern_set_filter(pattern: core::libc::intptr_t, filter: core::libc::c_int);
+	fn cairo_pattern_get_extend(pattern: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_pattern_set_extend(pattern: core::libc::intptr_t, extend: core::libc::c_int);
+	fn cairo_pattern_status(pattern: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_pattern_get_color_stop_count(pattern: core::libc::intptr_t, count: *core::libc::c_int);
+	fn cairo_pattern_get_surface(pattern: core::libc::intptr_t, surface: *core::libc::intptr_t);
+	fn cairo_pattern_add_color_stop_rgb(pattern: core::libc::intptr_t, offset: f64, red: f64, green: f64, blue: f64);
+	fn cairo_pattern_add_color_stop_rgba(pattern: core::libc::intptr_t, offset: f64, red: f64, green: f64, blue: f64, alpha: f64);
+	fn cairo_pattern_get_color_stop_rgba(pattern: core::libc::intptr_t, index: core::libc::c_int, offset: *f64, red: *f64, green: *f64, blue: *f64, alpha: *f64);
+	fn cairo_pattern_get_rgba(pattern: core::libc::intptr_t, red: *f64, green: *f64, blue: *f64, alpha: *f64);
+	fn cairo_pattern_get_linear_points(pattern: core::libc::intptr_t, x0: *f64, y0: *f64, x1: *f64, y1: *f64);
+	fn cairo_pattern_get_radial_circles(pattern: core::libc::intptr_t, cx0: *f64, cy0: *f64, radius0: *f64, cx1: *f64, cy1: *f64, radius1: *f64);
 	
-	fn cairo_format_stride_for_width(format: core::ctypes::c_int, width: core::ctypes::c_int) -> core::ctypes::c_int;
-	fn cairo_surface_create_similar(surface: core::ctypes::intptr_t, content: core::ctypes::c_int, width: core::ctypes::c_int, height: core::ctypes::c_int) -> core::ctypes::intptr_t;
-	fn cairo_image_surface_create_from_png(data: *u8) -> core::ctypes::intptr_t;
-	fn cairo_image_surface_create_for_data(data: *u8, format: core::ctypes::c_int, width: core::ctypes::c_int, height: core::ctypes::c_int, stride: core::ctypes::c_int) -> core::ctypes::intptr_t;
-	fn cairo_surface_write_to_png(surface: core::ctypes::intptr_t,file: *u8) -> core::ctypes::c_int;
-	fn cairo_surface_destroy(surface: core::ctypes::intptr_t);
-	fn cairo_image_surface_create(format: core::ctypes::c_int, width: core::ctypes::c_int, height: core::ctypes::c_int) -> core::ctypes::intptr_t;
-	fn cairo_surface_has_show_text_glyphs(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_surface_show_page(surface: core::ctypes::intptr_t);
-	fn cairo_surface_copy_page(surface: core::ctypes::intptr_t);
-	fn cairo_surface_get_type(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_surface_set_fallback_resolution(surface: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_surface_get_fallback_resolution(surface: core::ctypes::intptr_t, x: *f64, y: *f64);
-	fn cairo_surface_set_device_offset(surface: core::ctypes::intptr_t, x: f64, y: f64);
-	fn cairo_surface_get_device_offset(surface: core::ctypes::intptr_t, x: *f64, y: *f64);
-	fn cairo_surface_mark_dirty(surface: core::ctypes::intptr_t);
-	fn cairo_surface_mark_dirty_rectangle(surface: core::ctypes::intptr_t, x: core::ctypes::c_int, y: core::ctypes::c_int, width: core::ctypes::c_int, height: core::ctypes::c_int);
-	fn cairo_surface_get_content(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_surface_get_font_options(surface: core::ctypes::intptr_t, options: core::ctypes::intptr_t);
-	fn cairo_surface_get_device(surface: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_surface_status(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_surface_flush(surface: core::ctypes::intptr_t);
-	fn cairo_surface_reference(surface: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_image_surface_get_data(surface: core::ctypes::intptr_t) -> *u8;
-	fn cairo_image_surface_get_format(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_image_surface_get_height(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_image_surface_get_width(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_image_surface_get_stride(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_pdf_surface_restrict_to_version(surface: core::ctypes::intptr_t, version: core::ctypes::c_int);
-	fn cairo_svg_surface_restrict_to_version(surface: core::ctypes::intptr_t, version: core::ctypes::c_int);
-	fn cairo_pdf_surface_set_size(surface: core::ctypes::intptr_t, width: f64, height: f64);
-	fn cairo_pdf_surface_create(path: *u8, width: f64, height: f64) -> core::ctypes::intptr_t;
-	fn cairo_svg_surface_create(path: *u8, width: f64, height: f64) -> core::ctypes::intptr_t;
-	fn cairo_ps_surface_restrict_to_level(surface: core::ctypes::intptr_t, level: core::ctypes::c_int);
-	fn cairo_ps_surface_set_size(surface: core::ctypes::intptr_t, width: f64, height: f64);
-	fn cairo_ps_surface_set_eps(surface: core::ctypes::intptr_t, eps: core::ctypes::c_int);
-	fn cairo_ps_surface_get_eps(surface: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_ps_surface_dsc_begin_setup(surface: core::ctypes::intptr_t);
-	fn cairo_ps_surface_dsc_begin_page_setup(surface: core::ctypes::intptr_t);
-	fn cairo_ps_surface_dsc_comment(surface: core::ctypes::intptr_t, text: *u8);
-	fn cairo_ps_surface_create(path: *u8, width: f64, height: f64) -> core::ctypes::intptr_t;
+	fn cairo_format_stride_for_width(format: core::libc::c_int, width: core::libc::c_int) -> core::libc::c_int;
+	fn cairo_surface_create_similar(surface: core::libc::intptr_t, content: core::libc::c_int, width: core::libc::c_int, height: core::libc::c_int) -> core::libc::intptr_t;
+	fn cairo_image_surface_create_from_png(data: *u8) -> core::libc::intptr_t;
+	fn cairo_image_surface_create_for_data(data: *u8, format: core::libc::c_int, width: core::libc::c_int, height: core::libc::c_int, stride: core::libc::c_int) -> core::libc::intptr_t;
+	fn cairo_surface_write_to_png(surface: core::libc::intptr_t,file: *u8) -> core::libc::c_int;
+	fn cairo_surface_destroy(surface: core::libc::intptr_t);
+	fn cairo_image_surface_create(format: core::libc::c_int, width: core::libc::c_int, height: core::libc::c_int) -> core::libc::intptr_t;
+	fn cairo_surface_has_show_text_glyphs(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_surface_show_page(surface: core::libc::intptr_t);
+	fn cairo_surface_copy_page(surface: core::libc::intptr_t);
+	fn cairo_surface_get_type(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_surface_set_fallback_resolution(surface: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_surface_get_fallback_resolution(surface: core::libc::intptr_t, x: *f64, y: *f64);
+	fn cairo_surface_set_device_offset(surface: core::libc::intptr_t, x: f64, y: f64);
+	fn cairo_surface_get_device_offset(surface: core::libc::intptr_t, x: *f64, y: *f64);
+	fn cairo_surface_mark_dirty(surface: core::libc::intptr_t);
+	fn cairo_surface_mark_dirty_rectangle(surface: core::libc::intptr_t, x: core::libc::c_int, y: core::libc::c_int, width: core::libc::c_int, height: core::libc::c_int);
+	fn cairo_surface_get_content(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_surface_get_font_options(surface: core::libc::intptr_t, options: core::libc::intptr_t);
+	fn cairo_surface_get_device(surface: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_surface_status(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_surface_flush(surface: core::libc::intptr_t);
+	fn cairo_surface_reference(surface: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_image_surface_get_data(surface: core::libc::intptr_t) -> *u8;
+	fn cairo_image_surface_get_format(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_image_surface_get_height(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_image_surface_get_width(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_image_surface_get_stride(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_pdf_surface_restrict_to_version(surface: core::libc::intptr_t, version: core::libc::c_int);
+	fn cairo_svg_surface_restrict_to_version(surface: core::libc::intptr_t, version: core::libc::c_int);
+	fn cairo_pdf_surface_set_size(surface: core::libc::intptr_t, width: f64, height: f64);
+	fn cairo_pdf_surface_create(path: *u8, width: f64, height: f64) -> core::libc::intptr_t;
+	fn cairo_svg_surface_create(path: *u8, width: f64, height: f64) -> core::libc::intptr_t;
+	fn cairo_ps_surface_restrict_to_level(surface: core::libc::intptr_t, level: core::libc::c_int);
+	fn cairo_ps_surface_set_size(surface: core::libc::intptr_t, width: f64, height: f64);
+	fn cairo_ps_surface_set_eps(surface: core::libc::intptr_t, eps: core::libc::c_int);
+	fn cairo_ps_surface_get_eps(surface: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_ps_surface_dsc_begin_setup(surface: core::libc::intptr_t);
+	fn cairo_ps_surface_dsc_begin_page_setup(surface: core::libc::intptr_t);
+	fn cairo_ps_surface_dsc_comment(surface: core::libc::intptr_t, text: *u8);
+	fn cairo_ps_surface_create(path: *u8, width: f64, height: f64) -> core::libc::intptr_t;
 	
-	fn cairo_device_reference(device: core::ctypes::intptr_t) -> core::ctypes::intptr_t;
-	fn cairo_device_destroy(device: core::ctypes::intptr_t);
-	fn cairo_device_flush(device: core::ctypes::intptr_t);
-	fn cairo_device_acquire(device: core::ctypes::intptr_t) -> core::ctypes::c_int;
-	fn cairo_device_release(device: core::ctypes::intptr_t);
-	fn cairo_device_get_type(device: core::ctypes::intptr_t) -> core::ctypes::c_int;
+	fn cairo_device_reference(device: core::libc::intptr_t) -> core::libc::intptr_t;
+	fn cairo_device_destroy(device: core::libc::intptr_t);
+	fn cairo_device_flush(device: core::libc::intptr_t);
+	fn cairo_device_acquire(device: core::libc::intptr_t) -> core::libc::c_int;
+	fn cairo_device_release(device: core::libc::intptr_t);
+	fn cairo_device_get_type(device: core::libc::intptr_t) -> core::libc::c_int;
 	
-	fn cairo_status_to_string(status: core::ctypes::c_int) -> *u8;
+	fn cairo_status_to_string(status: core::libc::c_int) -> *libc::c_char;
 }
 
 const STATUS_SUCCESS: int = 0;
@@ -738,36 +738,36 @@ const FONT_TYPE_USER: int = 4;
 type font_type = int;
 
 type font_extents_record = {
-	mutable ascent: f64,
-	mutable descent: f64,
-	mutable height: f64,
-	mutable max_x_advance: f64,
-	mutable max_y_advance: f64
+	mut ascent: f64,
+	mut descent: f64,
+	mut height: f64,
+	mut max_x_advance: f64,
+	mut max_y_advance: f64
 };
 type text_extents_record = {
-	mutable x_bearing: f64,
-	mutable y_bearing: f64,
-	mutable width: f64,
-	mutable height: f64,
-	mutable x_advance: f64,
-	mutable y_advance: f64
+	mut x_bearing: f64,
+	mut y_bearing: f64,
+	mut width: f64,
+	mut height: f64,
+	mut x_advance: f64,
+	mut y_advance: f64
 };
 type matrix_record = {
-	mutable xx: f64,
-	mutable yx: f64,
-	mutable xy: f64,
-	mutable yy: f64,
-	mutable x0: f64,
-	mutable y0: f64
+	mut xx: f64,
+	mut yx: f64,
+	mut xy: f64,
+	mut yy: f64,
+	mut x0: f64,
+	mut y0: f64
 };
 type glyph_record = {
-	mutable index: core::ctypes::ulong,
-	mutable x: f64,
-	mutable y: f64
+	mut index: core::libc::c_ulong,
+	mut x: f64,
+	mut y: f64
 };
 type text_cluster_record = {
-	mutable num_bytes: core::ctypes::c_int,
-	mutable num_glyphs: core::ctypes::c_int
+	mut num_bytes: core::libc::c_int,
+	mut num_glyphs: core::libc::c_int
 };
 
 const SVG_VERSION_1_1: int = 0;
@@ -822,21 +822,21 @@ type pattern_type = int;
  */
 
 iface device {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 	
 	fn flush();
 	fn get_type() -> device_type;
 	fn acquire() -> status;
 	fn release();
 }
-resource device_res(internal: core::ctypes::intptr_t) {
+resource device_res(internal: core::libc::intptr_t) {
 	ccairo::cairo_device_destroy(internal);
 }
 
-fn wrap_device(internal: core::ctypes::intptr_t) -> device {
+fn wrap_device(internal: core::libc::intptr_t) -> device {
 	impl of device for @device_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		
 		fn flush() {
@@ -861,7 +861,7 @@ fn wrap_device(internal: core::ctypes::intptr_t) -> device {
  */
 
 iface surface {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 
 	fn pdf_restrict_to_version(version: pdf_version);
 	fn pdf_set_size(width_in_points: float, height_in_points: float);
@@ -876,7 +876,7 @@ iface surface {
 	fn ps_begin_page_setup_comments();
 	fn ps_comment(text: str);
 
-	fn image_get_data() -> [mutable u8];
+	fn image_get_data() -> [mut u8];
 	fn image_get_format() -> format;
 	fn image_get_width() -> uint;
 	fn image_get_height() -> uint;
@@ -899,40 +899,36 @@ iface surface {
 	fn copy_page();
 	fn has_show_text_glyphs() -> bool;
 }
-resource surface_res(internal: core::ctypes::intptr_t) {
+resource surface_res(internal: core::libc::intptr_t) {
 	ccairo::cairo_surface_destroy(internal);
 }
 
-fn wrap_surface(internal: core::ctypes::intptr_t) -> surface {
+fn wrap_surface(internal: core::libc::intptr_t) -> surface {
 	impl of surface for @surface_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		
 		fn pdf_restrict_to_version(version: pdf_version) {
-			ccairo::cairo_pdf_surface_restrict_to_version(**self, version as core::ctypes::c_int);
+			ccairo::cairo_pdf_surface_restrict_to_version(**self, version as core::libc::c_int);
 		}
 		fn pdf_set_size(width_in_points: float, height_in_points: float) {
 			ccairo::cairo_pdf_surface_set_size(**self, width_in_points, height_in_points);
 		}
 		fn svg_restrict_to_version(version: svg_version) {
-			ccairo::cairo_svg_surface_restrict_to_version(**self, version as core::ctypes::c_int);
+			ccairo::cairo_svg_surface_restrict_to_version(**self, version as core::libc::c_int);
 		}
 		fn ps_restrict_to_version(version: ps_version) {
-			ccairo::cairo_ps_surface_restrict_to_level(**self, version as core::ctypes::c_int);
+			ccairo::cairo_ps_surface_restrict_to_level(**self, version as core::libc::c_int);
 		}
 		fn ps_set_size(width_in_points: float, height_in_points: float) {
 			ccairo::cairo_ps_surface_set_size(**self, width_in_points, height_in_points);
 		}
-<<<<<<< HEAD
-		fn set_ps_encapsulated(eps: bool) {
-=======
 		fn ps_set_encapsulated(eps: bool) {
->>>>>>> v0.2.1
-			ccairo::cairo_ps_surface_set_eps(**self, eps as core::ctypes::c_int);
+			ccairo::cairo_ps_surface_set_eps(**self, eps as core::libc::c_int);
 		}
 		fn ps_is_encapsulated() -> bool {
-			ret ccairo::cairo_ps_surface_get_eps(**self) == (1 as core::ctypes::c_int);
+			ret ccairo::cairo_ps_surface_get_eps(**self) == (1 as core::libc::c_int);
 		}
 		fn ps_begin_setup_comments() {
 			ccairo::cairo_ps_surface_dsc_begin_setup(**self);
@@ -945,7 +941,7 @@ fn wrap_surface(internal: core::ctypes::intptr_t) -> surface {
 		
 			ccairo::cairo_ps_surface_dsc_comment(**self, core::vec::unsafe::to_ptr(bytes));
 		}
-		fn image_get_data() -> [mutable u8] unsafe { // TODO test if this is mutable, as rust might not keep the same pointers but reallocate
+		fn image_get_data() -> [mut u8] unsafe { // TODO test if this is mut, as rust might not keep the same pointers but reallocate
 			let data = ccairo::cairo_image_surface_get_data(**self); // FIXME boxed free
 		
 			ret core::vec::to_mut(core::vec::unsafe::from_buf(data, self.image_get_stride() * self.image_get_height()));
@@ -967,9 +963,9 @@ fn wrap_surface(internal: core::ctypes::intptr_t) -> surface {
 		}
 
 		fn write_to_file(file: str) -> status unsafe {
-			let path = std::fs::make_absolute(file);
-			let split = std::fs::splitext(path);
-			let bytes = core::str::bytes(path);
+			let path = core::os::make_absolute(file);
+			let split = core::path::splitext(path);
+			let mut bytes = core::str::bytes(path);
 		
 			core::vec::push(bytes, 0 as u8);
 		
@@ -1005,7 +1001,7 @@ fn wrap_surface(internal: core::ctypes::intptr_t) -> surface {
 			ccairo::cairo_surface_mark_dirty(**self);
 		}
 		fn mark_dirty_rectangle(x: uint, y: uint, width: uint, height: uint) {
-			ccairo::cairo_surface_mark_dirty_rectangle(**self, x as core::ctypes::c_int, y as core::ctypes::c_int, width as core::ctypes::c_int, height as core::ctypes::c_int);
+			ccairo::cairo_surface_mark_dirty_rectangle(**self, x as core::libc::c_int, y as core::libc::c_int, width as core::libc::c_int, height as core::libc::c_int);
 		}
 		fn set_device_offset(x: float, y: float) {
 			ccairo::cairo_surface_set_device_offset(**self, x, y);
@@ -1039,14 +1035,14 @@ fn wrap_surface(internal: core::ctypes::intptr_t) -> surface {
 			ccairo::cairo_surface_show_page(**self);
 		}
 		fn has_show_text_glyphs() -> bool {
-			ret ccairo::cairo_surface_has_show_text_glyphs(**self) == (1 as core::ctypes::c_int);
+			ret ccairo::cairo_surface_has_show_text_glyphs(**self) == (1 as core::libc::c_int);
 		}
 	}
 	
 	ret @surface_res(internal) as surface;
 }
 fn mk_surface_from_similar(other: surface, content: content, width: uint, height: uint) -> surface unsafe {
-	let result = wrap_surface(ccairo::cairo_surface_create_similar(other.get_internal(), content as core::ctypes::c_int, width as core::ctypes::c_int, height as core::ctypes::c_int));
+	let result = wrap_surface(ccairo::cairo_surface_create_similar(other.get_internal(), content as core::libc::c_int, width as core::libc::c_int, height as core::libc::c_int));
 	let status = result.get_status();
 	
 	if status != STATUS_SUCCESS {
@@ -1056,8 +1052,8 @@ fn mk_surface_from_similar(other: surface, content: content, width: uint, height
 	ret result;
 }
 fn mk_pdf_surface(file: str, width_in_points: float, height_in_points: float) -> surface unsafe {
-	let path = std::fs::make_absolute(file);
-	let bytes = core::str::bytes(path);
+	let path = core::os::make_absolute(file);
+	let mut bytes = core::str::bytes(path);
 		
 	core::vec::push(bytes, 0 as u8);
 	
@@ -1071,8 +1067,8 @@ fn mk_pdf_surface(file: str, width_in_points: float, height_in_points: float) ->
 	ret result;
 }
 fn mk_svg_surface(file: str, width_in_points: float, height_in_points: float) -> surface unsafe {
-	let path = std::fs::make_absolute(file);
-	let bytes = core::str::bytes(path);
+	let path = core::os::make_absolute(file);
+	let mut bytes = core::str::bytes(path);
 		
 	core::vec::push(bytes, 0 as u8);
 	
@@ -1086,8 +1082,8 @@ fn mk_svg_surface(file: str, width_in_points: float, height_in_points: float) ->
 	ret result;
 }
 fn mk_ps_surface(file: str, width_in_points: float, height_in_points: float) -> surface unsafe {
-	let path = std::fs::make_absolute(file);
-	let bytes = core::str::bytes(path);
+	let path = core::os::make_absolute(file);
+	let mut bytes = core::str::bytes(path);
 	
 	core::vec::push(bytes, 0 as u8);
 	
@@ -1101,7 +1097,7 @@ fn mk_ps_surface(file: str, width_in_points: float, height_in_points: float) -> 
 	ret result;
 }
 fn mk_image_surface(format: format, width: uint, height: uint) -> surface {
-	let result = wrap_surface(ccairo::cairo_image_surface_create(format as core::ctypes::c_int, width as core::ctypes::c_int, height as core::ctypes::c_int));
+	let result = wrap_surface(ccairo::cairo_image_surface_create(format as core::libc::c_int, width as core::libc::c_int, height as core::libc::c_int));
 	let status = result.get_status();
 	
 	if status != STATUS_SUCCESS {
@@ -1112,10 +1108,10 @@ fn mk_image_surface(format: format, width: uint, height: uint) -> surface {
 }
 fn mk_image_surface_from_file(file: str) -> surface unsafe {
 	// TODO .jpg (maybe .bmp)
-	let path = std::fs::make_absolute(file);
-	let split = std::fs::splitext(path);
-	let bytes = core::str::bytes(path);
-	let internal: core::ctypes::intptr_t;
+	let path = core::os::make_absolute(file);
+	let split = core::path::splitext(path);
+	let mut bytes = core::str::bytes(path);
+	let mut internal: core::libc::intptr_t;
 	
 	core::vec::push(bytes, 0 as u8);
 	
@@ -1132,9 +1128,9 @@ fn mk_image_surface_from_file(file: str) -> surface unsafe {
 			let mode = "rb";
 			let mode_bytes = core::str::bytes(mode);
 			let mode_cstr = core::vec::unsafe::to_ptr(mode_bytes);
-			let file: core::ctypes::intptr_t = c::fopen(path_cstr, mode_cstr);
+			let file: core::libc::intptr_t = c::fopen(path_cstr, mode_cstr);
 			
-			if file == (0 as core::ctypes::intptr_t) {
+			if file == (0 as core::libc::intptr_t) {
 				fail "Could not make an image surface from a file: unable to load image";
 			}
 			
@@ -1157,7 +1153,7 @@ fn mk_image_surface_from_file(file: str) -> surface unsafe {
 	ret result;
 }
 fn mk_image_surface_from_data(data: [u8], format: format, width: uint, height: uint, stride: uint) -> surface unsafe {
-	let result = wrap_surface(ccairo::cairo_image_surface_create_for_data(core::vec::unsafe::to_ptr(data), format as core::ctypes::c_int, width as core::ctypes::c_int, height as core::ctypes::c_int, stride as core::ctypes::c_int));
+	let result = wrap_surface(ccairo::cairo_image_surface_create_for_data(core::vec::unsafe::to_ptr(data), format as core::libc::c_int, width as core::libc::c_int, height as core::libc::c_int, stride as core::libc::c_int));
 	let status = result.get_status();
 	
 	if status != STATUS_SUCCESS {
@@ -1172,7 +1168,7 @@ fn mk_image_surface_from_data(data: [u8], format: format, width: uint, height: u
  */
 
 iface pattern {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 	
 	fn add_color_stop_rgb(offset: float, red: float, green: float, blue: float);
 	fn add_color_stop_rgba(offset: float, red: float, green: float, blue: float, alpha: float);
@@ -1191,14 +1187,14 @@ iface pattern {
 	fn get_matrix() -> matrix;
 	fn get_type() -> pattern_type;
 }
-resource pattern_res(internal: core::ctypes::intptr_t) {
+resource pattern_res(internal: core::libc::intptr_t) {
 	ccairo::cairo_pattern_destroy(internal);
 }
 
-fn wrap_pattern(internal: core::ctypes::intptr_t) -> pattern {
+fn wrap_pattern(internal: core::libc::intptr_t) -> pattern {
 	impl of pattern for @pattern_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		
 		fn add_color_stop_rgb(offset: float, red: float, green: float, blue: float) {
@@ -1208,7 +1204,7 @@ fn wrap_pattern(internal: core::ctypes::intptr_t) -> pattern {
 			ccairo::cairo_pattern_add_color_stop_rgba(**self, offset, red, green, blue, alpha);
 		}
 		fn get_color_stop_count() -> uint {
-			let count: core::ctypes::c_int = 0 as core::ctypes::c_int;
+			let count: core::libc::c_int = 0 as core::libc::c_int;
 		
 			ccairo::cairo_pattern_get_color_stop_count(**self, core::ptr::addr_of(count));
 		
@@ -1221,7 +1217,7 @@ fn wrap_pattern(internal: core::ctypes::intptr_t) -> pattern {
 			let blue: f64 = 0.0;
 			let alpha: f64 = 0.0;
 		
-			ccairo::cairo_pattern_get_color_stop_rgba(**self, index as core::ctypes::c_int, core::ptr::addr_of(offset), core::ptr::addr_of(red), core::ptr::addr_of(green), core::ptr::addr_of(blue), core::ptr::addr_of(alpha));
+			ccairo::cairo_pattern_get_color_stop_rgba(**self, index as core::libc::c_int, core::ptr::addr_of(offset), core::ptr::addr_of(red), core::ptr::addr_of(green), core::ptr::addr_of(blue), core::ptr::addr_of(alpha));
 		
 			ret (offset, red, green, blue, alpha);
 		}
@@ -1236,7 +1232,7 @@ fn wrap_pattern(internal: core::ctypes::intptr_t) -> pattern {
 			ret (red, green, blue, alpha);
 		}
 		fn get_surface() -> surface {
-			let internal: core::ctypes::intptr_t = 0 as core::ctypes::intptr_t;
+			let internal: core::libc::intptr_t = 0 as core::libc::intptr_t;
 		
 			ccairo::cairo_pattern_get_surface(**self, core::ptr::addr_of(internal));
 		
@@ -1268,13 +1264,13 @@ fn wrap_pattern(internal: core::ctypes::intptr_t) -> pattern {
 			ret ccairo::cairo_pattern_status(**self) as status;
 		}
 		fn set_extend(extend: extend) {
-			ccairo::cairo_pattern_set_extend(**self, extend as core::ctypes::c_int);
+			ccairo::cairo_pattern_set_extend(**self, extend as core::libc::c_int);
 		}
 		fn get_extend() -> extend {
 			ret ccairo::cairo_pattern_get_extend(**self) as extend;
 		}
 		fn set_filter(filter: filter) {
-			ccairo::cairo_pattern_set_filter(**self, filter as core::ctypes::c_int);
+			ccairo::cairo_pattern_set_filter(**self, filter as core::libc::c_int);
 		}
 		fn get_extend() -> extend {
 			ret ccairo::cairo_pattern_get_filter(**self) as filter;
@@ -1356,7 +1352,7 @@ fn mk_pattern_from_surface(surface: surface) -> pattern {
  */
 
 iface matrix {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 	fn get_record() -> matrix_record;
 	
 	fn get_values() -> [float];
@@ -1373,14 +1369,14 @@ iface matrix {
 	fn transform_distance(x: float, y: float) -> (float, float);
 	fn transform_point(x: float, y: float) -> (float, float);
 }
-resource matrix_res(internal: core::ctypes::intptr_t) {
+resource matrix_res(internal: core::libc::intptr_t) {
 	internal;
 }
 
-fn wrap_matrix(internal: core::ctypes::intptr_t) -> matrix {
+fn wrap_matrix(internal: core::libc::intptr_t) -> matrix {
 	impl of matrix for @matrix_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		fn get_record() -> matrix_record unsafe {
 			ret *(self.get_internal() as *matrix_record);
@@ -1455,14 +1451,14 @@ fn wrap_matrix(internal: core::ctypes::intptr_t) -> matrix {
 }
 fn mk_matrix(values: [float]) -> matrix {
 	let record: matrix_record = {
-		mutable xx: 0.0,
-		mutable yx: 0.0,
-		mutable xy: 0.0,
-		mutable yy: 0.0,
-		mutable x0: 0.0,
-		mutable y0: 0.0
+		mut xx: 0.0,
+		mut yx: 0.0,
+		mut xy: 0.0,
+		mut yy: 0.0,
+		mut x0: 0.0,
+		mut y0: 0.0
 	};
-	let result = wrap_matrix(core::ptr::addr_of(record) as core::ctypes::intptr_t);
+	let result = wrap_matrix(core::ptr::addr_of(record) as core::libc::intptr_t);
 	
 	result.set_values(values);
 	
@@ -1474,16 +1470,16 @@ fn mk_matrix(values: [float]) -> matrix {
  */
 
 iface path {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 }
-resource path_res(internal: core::ctypes::intptr_t) {
+resource path_res(internal: core::libc::intptr_t) {
 	ccairo::cairo_path_destroy(internal);
 }
 
-fn wrap_path(internal: core::ctypes::intptr_t) -> path {
+fn wrap_path(internal: core::libc::intptr_t) -> path {
 	impl of path for @path_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 	}
 	
@@ -1495,7 +1491,7 @@ fn wrap_path(internal: core::ctypes::intptr_t) -> path {
  */
 
 iface glyph {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 	fn get_record() -> glyph_record;
 
 	fn set_index(index: uint);
@@ -1505,21 +1501,21 @@ iface glyph {
 	fn get_x() -> float;
 	fn get_y() -> float;
 }
-resource glyph_res(internal: core::ctypes::intptr_t) {
+resource glyph_res(internal: core::libc::intptr_t) {
 	internal;
 }
 
-fn wrap_glyph(internal: core::ctypes::intptr_t) -> glyph {
+fn wrap_glyph(internal: core::libc::intptr_t) -> glyph {
 	impl of glyph for @glyph_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		fn get_record() -> glyph_record unsafe {
 			ret *(self.get_internal() as *glyph_record);
 		}
 		
 		fn set_index(index: uint) {
-			self.get_record().index = index as core::ctypes::ulong;
+			self.get_record().index = index as core::libc::c_ulong;
 		}
 		fn set_x(x: float) {
 			self.get_record().x = x as float;
@@ -1542,16 +1538,16 @@ fn wrap_glyph(internal: core::ctypes::intptr_t) -> glyph {
 }
 fn mk_glyph(index: uint, x: float, y: float) -> glyph {
 	let record: glyph_record = { // FIXME
-		mutable index: index,
-		mutable x: x,
-		mutable y: y
+		mut index: index,
+		mut x: x,
+		mut y: y
 	};
 	
-	ret wrap_glyph(core::ptr::addr_of(record) as core::ctypes::intptr_t);
+	ret wrap_glyph(core::ptr::addr_of(record) as core::libc::intptr_t);
 }
 
 iface text_cluster {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 	fn get_record() -> text_cluster_record;
 	
 	fn set_num_bytes(num_bytes: uint);
@@ -1559,24 +1555,24 @@ iface text_cluster {
 	fn get_num_bytes() -> uint;
 	fn get_num_glyphs() -> uint;
 }
-resource text_cluster_res(internal: core::ctypes::intptr_t) {
+resource text_cluster_res(internal: core::libc::intptr_t) {
 	internal;
 }
 
-fn wrap_text_cluster(internal: core::ctypes::intptr_t) -> text_cluster {
+fn wrap_text_cluster(internal: core::libc::intptr_t) -> text_cluster {
 	impl of text_cluster for @text_cluster_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		fn get_record() -> text_cluster_record unsafe {
 			ret *(self.get_internal() as *text_cluster_record);
 		}
 		
 		fn set_num_bytes(num_bytes: uint) {
-			self.get_record().num_bytes = num_bytes as core::ctypes::c_int;
+			self.get_record().num_bytes = num_bytes as core::libc::c_int;
 		}
 		fn set_num_glyphs(num_glyphs: uint) {
-			self.get_record().num_glyphs = num_glyphs as core::ctypes::c_int;
+			self.get_record().num_glyphs = num_glyphs as core::libc::c_int;
 		}
 		fn get_num_bytes() -> uint {
 			ret self.get_record().num_bytes as uint;
@@ -1590,15 +1586,15 @@ fn wrap_text_cluster(internal: core::ctypes::intptr_t) -> text_cluster {
 }
 fn mk_text_cluster(num_bytes: uint, num_glyphs: uint) -> text_cluster {
 	let record: text_cluster_record = {
-		mutable num_bytes: num_bytes as core::ctypes::c_int,
-		mutable num_glyphs: num_glyphs as core::ctypes::c_int
+		mut num_bytes: num_bytes as core::libc::c_int,
+		mut num_glyphs: num_glyphs as core::libc::c_int
 	};
 	
-	ret wrap_text_cluster(core::ptr::addr_of(record) as core::ctypes::intptr_t);
+	ret wrap_text_cluster(core::ptr::addr_of(record) as core::libc::intptr_t);
 }
 
 iface font_extents {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 	fn get_record() -> font_extents_record;
 
 	fn get_ascent() -> float;
@@ -1607,14 +1603,14 @@ iface font_extents {
 	fn get_max_x_advance() -> float;
 	fn get_max_y_advance() -> float;
 }
-resource font_extents_res(internal: core::ctypes::intptr_t) {
+resource font_extents_res(internal: core::libc::intptr_t) {
 	internal;
 }
 
-fn wrap_font_extents(internal: core::ctypes::intptr_t) -> font_extents {
+fn wrap_font_extents(internal: core::libc::intptr_t) -> font_extents {
 	impl of font_extents for @font_extents_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		fn get_record() -> font_extents_record unsafe {
 			ret *(self.get_internal() as *font_extents_record);
@@ -1641,7 +1637,7 @@ fn wrap_font_extents(internal: core::ctypes::intptr_t) -> font_extents {
 }
 
 iface text_extents {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 	fn get_record() -> text_extents_record;
 
 	fn get_x_bearing() -> float;
@@ -1652,14 +1648,14 @@ iface text_extents {
 	fn get_x_advance() -> float;
 	fn get_y_bearing() -> float;
 }
-resource text_extents_res(internal: core::ctypes::intptr_t) {
+resource text_extents_res(internal: core::libc::intptr_t) {
 	internal;
 }
 
-fn wrap_text_extents(internal: core::ctypes::intptr_t) -> text_extents {
+fn wrap_text_extents(internal: core::libc::intptr_t) -> text_extents {
 	impl of text_extents for @text_extents_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		fn get_record() -> text_extents_record unsafe {
 			ret *(self.get_internal() as *text_extents_record);
@@ -1692,13 +1688,13 @@ fn wrap_text_extents(internal: core::ctypes::intptr_t) -> text_extents {
 }
 
 type font_face_free_record = {
-	library: core::ctypes::intptr_t,
-	face: core::ctypes::intptr_t,
-	internal: core::ctypes::intptr_t
+	library: core::libc::intptr_t,
+	face: core::libc::intptr_t,
+	internal: core::libc::intptr_t
 };
 
 iface font_face {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 
 	fn get_status() -> status;
 	fn get_type() -> font_type;
@@ -1713,18 +1709,18 @@ resource font_face_res(record: @font_face_free_record) {
 	
 	ccairo::cairo_font_face_destroy(internal);
 	
-	if face != (0 as core::ctypes::intptr_t) {
+	if face != (0 as core::libc::intptr_t) {
 		cft::FT_Done_Face(face);
 	}
-	if library != (0 as core::ctypes::intptr_t) {
+	if library != (0 as core::libc::intptr_t) {
 		cft::FT_Done_FreeType(library);
 	}
 }
 
 fn wrap_font_face(record: @font_face_free_record) -> font_face {
 	impl of font_face for @font_face_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret self.internal as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret self.internal as core::libc::intptr_t;
 		}
 		
 		fn get_status() -> status {
@@ -1740,21 +1736,21 @@ fn wrap_font_face(record: @font_face_free_record) -> font_face {
 			ret ccairo::cairo_toy_font_face_get_weight(self.internal) as font_weight;
 		}
 		fn get_toy_family() -> str unsafe {
-			ret core::str::from_cstr(ccairo::cairo_toy_font_face_get_family(self.internal));
+			ret core::str::unsafe::from_c_str(ccairo::cairo_toy_font_face_get_family(self.internal));
 		}
 	}
 	
 	ret @font_face_res(record) as font_face;
 }
 fn mk_font_face_from_toy_font(family: str, slant: font_slant, weight: font_weight) -> font_face unsafe {
-	let bytes = core::str::bytes(family);
+	let mut bytes = core::str::bytes(family);
 	
 	core::vec::push(bytes, 0 as u8);
 	
 	let free_record: @font_face_free_record = @{
-		library: 0 as ctypes::intptr_t,
-		face: 0 as ctypes::intptr_t,
-		internal: ccairo::cairo_toy_font_face_create(core::vec::unsafe::to_ptr(bytes), slant as core::ctypes::c_int, weight as core::ctypes::c_int)
+		library: 0 as libc::intptr_t,
+		face: 0 as libc::intptr_t,
+		internal: ccairo::cairo_toy_font_face_create(core::vec::unsafe::to_ptr(bytes), slant as core::libc::c_int, weight as core::libc::c_int)
 	};
 	let result = wrap_font_face(free_record);
 	let status = result.get_status();
@@ -1767,26 +1763,26 @@ fn mk_font_face_from_toy_font(family: str, slant: font_slant, weight: font_weigh
 }
 
 fn mk_font_face_from_file(file: str) -> font_face unsafe {
-	let path = std::fs::make_absolute(file);
-	let split = std::fs::splitext(path);
-	let bytes = core::str::bytes(path);
-	let internal: core::ctypes::intptr_t;
-	let face_internal: core::ctypes::intptr_t = 0 as core::ctypes::intptr_t;
-		let library_internal: core::ctypes::intptr_t = 0 as core::ctypes::intptr_t;
+	let path = core::os::make_absolute(file);
+	let split = core::path::splitext(path);
+	let mut bytes = core::str::bytes(path);
+	let mut internal: core::libc::intptr_t;
+	let face_internal: core::libc::intptr_t = 0 as core::libc::intptr_t;
+		let library_internal: core::libc::intptr_t = 0 as core::libc::intptr_t;
 	
 	core::vec::push(bytes, 0 as u8);
 		
 	alt split {
 		(base, ".ttf") {
-			if cft::FT_Init_FreeType(core::ptr::addr_of(library_internal)) != (0 as core::ctypes::c_int) {
+			if cft::FT_Init_FreeType(core::ptr::addr_of(library_internal)) != (0 as core::libc::c_int) {
 				fail "Could not make a font face from a font file: unable to initialize freetype";
 			}
 
-			if cft::FT_New_Face(library_internal, core::vec::unsafe::to_ptr(bytes), 0 as core::ctypes::long, core::ptr::addr_of(face_internal)) != (0 as core::ctypes::c_int) {
+			if cft::FT_New_Face(library_internal, core::vec::unsafe::to_ptr(bytes), 0 as core::libc::c_long, core::ptr::addr_of(face_internal)) != (0 as core::libc::c_int) {
 				fail "Could not make a font face from a font file: unable to load font";
 			}
 			
-			internal = ccairo::cairo_ft_font_face_create_for_ft_face(face_internal, 0 as core::ctypes::c_int);
+			internal = ccairo::cairo_ft_font_face_create_for_ft_face(face_internal, 0 as core::libc::c_int);
 		}
 		(base, _) {
 			fail "Could not make a font face from a font file: unsupported font extension";
@@ -1809,7 +1805,7 @@ fn mk_font_face_from_file(file: str) -> font_face unsafe {
 }
 
 iface scaled_font {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 	
 	fn get_status() -> status;
 	fn extents() -> font_extents;
@@ -1822,14 +1818,14 @@ iface scaled_font {
 	fn get_scale_matrix() -> matrix;
 	fn get_type() -> font_type;
 }
-resource scaled_font_res(internal: core::ctypes::intptr_t) {
+resource scaled_font_res(internal: core::libc::intptr_t) {
 	ccairo::cairo_scaled_font_destroy(internal);
 }
 
-fn wrap_scaled_font(internal: core::ctypes::intptr_t) -> scaled_font {
+fn wrap_scaled_font(internal: core::libc::intptr_t) -> scaled_font {
 	impl of scaled_font for @scaled_font_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 	
 		fn get_status() -> status {
@@ -1837,29 +1833,29 @@ fn wrap_scaled_font(internal: core::ctypes::intptr_t) -> scaled_font {
 		}
 		fn extents() -> font_extents {
 			let record: font_extents_record = {
-				mutable ascent: 0.0,
-				mutable descent: 0.0,
-				mutable height: 0.0,
-				mutable max_x_advance: 0.0,
-				mutable max_y_advance: 0.0
+				mut ascent: 0.0,
+				mut descent: 0.0,
+				mut height: 0.0,
+				mut max_x_advance: 0.0,
+				mut max_y_advance: 0.0
 			};
-			let result = wrap_font_extents(core::ptr::addr_of(record) as core::ctypes::intptr_t);
+			let result = wrap_font_extents(core::ptr::addr_of(record) as core::libc::intptr_t);
 		
 			ccairo::cairo_scaled_font_extents(**self, result.get_internal());
 		
 			ret result;
 		}
 		fn text_extents(text: str) -> text_extents unsafe {
-			let bytes = core::str::bytes(text);
+			let mut bytes = core::str::bytes(text);
 			let record: text_extents_record = {
-				mutable x_bearing: 0.0,
-				mutable y_bearing: 0.0,
-				mutable width: 0.0,
-				mutable height: 0.0,
-				mutable x_advance: 0.0,
-				mutable y_advance: 0.0
+				mut x_bearing: 0.0,
+				mut y_bearing: 0.0,
+				mut width: 0.0,
+				mut height: 0.0,
+				mut x_advance: 0.0,
+				mut y_advance: 0.0
 			};
-			let result = wrap_text_extents(core::ptr::addr_of(record) as core::ctypes::intptr_t);
+			let result = wrap_text_extents(core::ptr::addr_of(record) as core::libc::intptr_t);
 		
 			core::vec::push(bytes, 0 as u8);
 			ccairo::cairo_scaled_font_text_extents(**self, core::vec::unsafe::to_ptr(bytes), result.get_internal());
@@ -1868,28 +1864,28 @@ fn wrap_scaled_font(internal: core::ctypes::intptr_t) -> scaled_font {
 		}
 		fn glyph_extents(glyphs: [glyph]) -> text_extents unsafe {
 			let record: text_extents_record = {
-				mutable x_bearing: 0.0,
-				mutable y_bearing: 0.0,
-				mutable width: 0.0,
-				mutable height: 0.0,
-				mutable x_advance: 0.0,
-				mutable y_advance: 0.0
+				mut x_bearing: 0.0,
+				mut y_bearing: 0.0,
+				mut width: 0.0,
+				mut height: 0.0,
+				mut x_advance: 0.0,
+				mut y_advance: 0.0
 			};
-			let result = wrap_text_extents(core::ptr::addr_of(record) as core::ctypes::intptr_t);
-			let cglyphs: [core::ctypes::intptr_t] = [];
+			let result = wrap_text_extents(core::ptr::addr_of(record) as core::libc::intptr_t);
+			let mut cglyphs: [core::libc::intptr_t] = [];
 		
 			for glyph in glyphs {
 				cglyphs += [glyph.get_internal()];
 			}
 		
-			ccairo::cairo_scaled_font_glyph_extents(**self, core::vec::unsafe::to_ptr(cglyphs) as core::ctypes::intptr_t, core::vec::len(cglyphs) as core::ctypes::c_int, result.get_internal());
+			ccairo::cairo_scaled_font_glyph_extents(**self, core::vec::unsafe::to_ptr(cglyphs) as core::libc::intptr_t, core::vec::len(cglyphs) as core::libc::c_int, result.get_internal());
 		
 			ret result;
 		}
 		fn get_font_face() -> font_face { // FIXME
 			let free_record: @font_face_free_record = @{
-				library: 0 as ctypes::intptr_t,
-				face: 0 as ctypes::intptr_t,
+				library: 0 as libc::intptr_t,
+				face: 0 as libc::intptr_t,
 				internal: ccairo::cairo_font_face_reference(ccairo::cairo_scaled_font_get_font_face(**self))
 			};
 		
@@ -1944,7 +1940,7 @@ fn wrap_scaled_font(internal: core::ctypes::intptr_t) -> scaled_font {
 }
 
 iface font_options {
-	fn get_internal() -> core::ctypes::intptr_t;	
+	fn get_internal() -> core::libc::intptr_t;	
 	
 	fn get_status() -> status;
 	fn hash() -> uint;
@@ -1959,14 +1955,14 @@ iface font_options {
 	fn set_hint_metrics(hint: hint_metrics);
 	fn get_hint_metrics() -> hint_metrics;
 }
-resource font_options_res(internal: core::ctypes::intptr_t) {
+resource font_options_res(internal: core::libc::intptr_t) {
 	ccairo::cairo_font_options_destroy(internal);
 }
 
-fn wrap_font_options(internal: core::ctypes::intptr_t) -> font_options {
+fn wrap_font_options(internal: core::libc::intptr_t) -> font_options {
 	impl of font_options for @font_options_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 		
 		fn get_status() -> status {
@@ -1979,28 +1975,28 @@ fn wrap_font_options(internal: core::ctypes::intptr_t) -> font_options {
 			ret ccairo::cairo_font_options_hash(**self) as uint;
 		}
 		fn equals(other: font_options) -> bool {
-			ret ccairo::cairo_font_options_equal(**self, other.get_internal()) == (1 as core::ctypes::c_int);
+			ret ccairo::cairo_font_options_equal(**self, other.get_internal()) == (1 as core::libc::c_int);
 		}
 		fn set_antialias(antialias: antialias) {
-			ccairo::cairo_font_options_set_antialias(**self, antialias as core::ctypes::c_int);
+			ccairo::cairo_font_options_set_antialias(**self, antialias as core::libc::c_int);
 		}
 		fn get_antialias() -> antialias {
 			ret ccairo::cairo_font_options_get_antialias(**self) as antialias;
 		}
 		fn set_subpixel_order(order: subpixel_order) {
-			ccairo::cairo_font_options_set_subpixel_order(**self, order as core::ctypes::c_int);
+			ccairo::cairo_font_options_set_subpixel_order(**self, order as core::libc::c_int);
 		}
 		fn get_subpixel_order() -> subpixel_order {
 			ret ccairo::cairo_font_options_get_subpixel_order(**self) as subpixel_order;
 		}
 		fn set_hint_style(hint: hint_style) {
-			ccairo::cairo_font_options_set_hint_style(**self, hint as core::ctypes::c_int);
+			ccairo::cairo_font_options_set_hint_style(**self, hint as core::libc::c_int);
 		}
 		fn get_hint_style() -> hint_style {
 			ret ccairo::cairo_font_options_get_hint_style(**self) as hint_style;
 		}
 		fn set_hint_metrics(hint: hint_metrics) {
-			ccairo::cairo_font_options_set_hint_metrics(**self, hint as core::ctypes::c_int);
+			ccairo::cairo_font_options_set_hint_metrics(**self, hint as core::libc::c_int);
 		}
 		fn get_hint_metrics() -> hint_metrics {
 			ret ccairo::cairo_font_options_get_hint_metrics(**self) as hint_metrics;
@@ -2021,7 +2017,7 @@ fn mk_font_options_from_copy(other: font_options) -> font_options {
  */
 
 iface context {
-	fn get_internal() -> core::ctypes::intptr_t;
+	fn get_internal() -> core::libc::intptr_t;
 
 	fn get_status() -> status;
 	fn save();
@@ -2127,14 +2123,14 @@ iface context {
 	fn text_extents(text: str) -> text_extents;
 	fn glyph_extents(glyphs: [glyph]) -> text_extents;
 }
-resource context_res(internal: core::ctypes::intptr_t) {
+resource context_res(internal: core::libc::intptr_t) {
 	ccairo::cairo_destroy(internal);
 }
 
-fn wrap_context(internal: core::ctypes::intptr_t) -> context {
+fn wrap_context(internal: core::libc::intptr_t) -> context {
 	impl of context for @context_res {
-		fn get_internal() -> core::ctypes::intptr_t {
-			ret **self as core::ctypes::intptr_t;
+		fn get_internal() -> core::libc::intptr_t {
+			ret **self as core::libc::intptr_t;
 		}
 	
 		fn get_status() -> status {
@@ -2153,7 +2149,7 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ccairo::cairo_push_group(**self);
 		}
 		fn push_group_with_content(content: content) {
-			ccairo::cairo_push_group_with_content(**self, content as core::ctypes::c_int);
+			ccairo::cairo_push_group_with_content(**self, content as core::libc::c_int);
 		}
 		fn pop_group() -> pattern {
 			ret wrap_pattern(ccairo::cairo_pop_group(**self));
@@ -2180,13 +2176,13 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ret wrap_pattern(ccairo::cairo_get_source(**self));
 		}
 		fn set_antialias(antialias: antialias) {
-			ccairo::cairo_set_antialias(**self, antialias as core::ctypes::c_int);
+			ccairo::cairo_set_antialias(**self, antialias as core::libc::c_int);
 		}
 		fn get_antialias() -> antialias {
 			ret ccairo::cairo_get_antialias(**self) as antialias;
 		}
 		fn set_dash(dashes: [float], offset: float) unsafe {
-			ccairo::cairo_set_dash(**self, core::vec::unsafe::to_ptr(dashes), core::vec::len(dashes) as core::ctypes::c_int, offset);
+			ccairo::cairo_set_dash(**self, core::vec::unsafe::to_ptr(dashes), core::vec::len(dashes) as core::libc::c_int, offset);
 		}
 		fn get_dash_count() -> uint {
 			ret ccairo::cairo_get_dash_count(**self) as uint;
@@ -2206,19 +2202,19 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ret offset;
 		}
 		fn set_fill_rule(rule: fill_rule) {
-			ccairo::cairo_set_fill_rule(**self, rule as core::ctypes::c_int);
+			ccairo::cairo_set_fill_rule(**self, rule as core::libc::c_int);
 		}
 		fn get_fill_rule() -> fill_rule {
 			ret ccairo::cairo_get_fill_rule(**self) as fill_rule;
 		}
 		fn set_line_cap(cap: line_cap) {
-			ccairo::cairo_set_line_cap(**self, cap as core::ctypes::c_int);
+			ccairo::cairo_set_line_cap(**self, cap as core::libc::c_int);
 		}
 		fn get_line_cap() -> line_cap {
 			ret ccairo::cairo_get_line_cap(**self) as line_cap;
 		}
 		fn set_line_join(join: line_join) {
-			ccairo::cairo_set_line_join(**self, join as core::ctypes::c_int);
+			ccairo::cairo_set_line_join(**self, join as core::libc::c_int);
 		}
 		fn get_line_join() -> line_join {
 			ret ccairo::cairo_get_line_join(**self) as line_join;
@@ -2236,7 +2232,7 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ret ccairo::cairo_get_miter_limit(**self);
 		}
 		fn set_operator(op: operator) {
-			ccairo::cairo_set_operator(**self, op as core::ctypes::c_int);
+			ccairo::cairo_set_operator(**self, op as core::libc::c_int);
 		}
 		fn get_operator() -> operator {
 			ret ccairo::cairo_get_operator(**self) as operator;
@@ -2264,7 +2260,7 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ret (x1, y1, x2, y2);
 		}
 		fn in_clip(x: float, y: float) -> bool {
-			ret ccairo::cairo_in_clip(**self, x, y) == (1 as core::ctypes::c_int);
+			ret ccairo::cairo_in_clip(**self, x, y) == (1 as core::libc::c_int);
 		}
 		fn reset_clip() {
 			ccairo::cairo_reset_clip(**self);
@@ -2286,7 +2282,7 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ret (x1, y1, x2, y2);
 		}
 		fn in_fill(x: float, y: float) -> bool {
-			ret ccairo::cairo_in_fill(**self, x, y) == (1 as core::ctypes::c_int);
+			ret ccairo::cairo_in_fill(**self, x, y) == (1 as core::libc::c_int);
 		}
 		fn mask(pattern: pattern) {
 			ccairo::cairo_mask(**self, pattern.get_internal());
@@ -2317,7 +2313,7 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ret (x1, y1, x2, y2);
 		}
 		fn in_stroke(x: float, y: float) -> bool {
-			ret ccairo::cairo_in_stroke(**self, x, y) == (1 as core::ctypes::c_int);
+			ret ccairo::cairo_in_stroke(**self, x, y) == (1 as core::libc::c_int);
 		}
 		fn copy_page() {
 			ccairo::cairo_copy_page(**self);
@@ -2336,7 +2332,7 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ccairo::cairo_append_path(**self, path.get_internal());
 		}
 		fn has_current_point() -> bool {
-			ret ccairo::cairo_has_current_point(**self) == (1 as core::ctypes::c_int);
+			ret ccairo::cairo_has_current_point(**self) == (1 as core::libc::c_int);
 		}
 		fn get_current_point() -> (float, float) {
 			let x: f64 = 0.0;
@@ -2374,16 +2370,16 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ccairo::cairo_rectangle(**self, x, y, width, height);
 		}
 		fn glyph_path(glyphs: [glyph]) unsafe {
-			let cglyphs: [core::ctypes::intptr_t] = [];
+			let mut cglyphs: [core::libc::intptr_t] = [];
 		
 			for glyph in glyphs {
 				cglyphs += [glyph.get_internal()];
 			}
 		
-			ccairo::cairo_glyph_path(**self, core::vec::unsafe::to_ptr(cglyphs) as core::ctypes::intptr_t, core::vec::len(cglyphs) as core::ctypes::c_int);
+			ccairo::cairo_glyph_path(**self, core::vec::unsafe::to_ptr(cglyphs) as core::libc::intptr_t, core::vec::len(cglyphs) as core::libc::c_int);
 		}
 		fn text_path(text: str) unsafe {
-			let bytes = core::str::bytes(text);
+			let mut bytes = core::str::bytes(text);
 		
 			core::vec::push(bytes, 0 as u8);
 		
@@ -2464,11 +2460,11 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 		}
 	
 		fn select_font_face(face: str, slant: font_slant, weight: font_weight) unsafe {
-			let bytes = core::str::bytes(face);
+			let mut bytes = core::str::bytes(face);
 		
 			core::vec::push(bytes, 0 as u8);
 		
-			ccairo::cairo_select_font_face(**self, core::vec::unsafe::to_ptr(bytes), slant as core::ctypes::c_int, weight as core::ctypes::c_int);
+			ccairo::cairo_select_font_face(**self, core::vec::unsafe::to_ptr(bytes), slant as core::libc::c_int, weight as core::libc::c_int);
 		}
 		fn set_font_size(size: float) {
 			ccairo::cairo_set_font_size(**self, size);
@@ -2477,7 +2473,7 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ccairo::cairo_set_font_matrix(**self, matrix.get_internal());
 		}
 		fn get_font_matrix() -> matrix {
-			let internal: core::ctypes::intptr_t = 0 as core::ctypes::intptr_t;
+			let internal: core::libc::intptr_t = 0 as core::libc::intptr_t;
 		
 			ccairo::cairo_get_font_matrix(**self, core::ptr::addr_of(internal));
 		
@@ -2487,7 +2483,7 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ccairo::cairo_set_font_options(**self, options.get_internal());
 		}
 		fn get_font_options() -> font_options {
-			let internal: core::ctypes::intptr_t = 0 as core::ctypes::intptr_t;
+			let internal: core::libc::intptr_t = 0 as core::libc::intptr_t;
 		
 			ccairo::cairo_get_font_options(**self, core::ptr::addr_of(internal));
 		
@@ -2498,8 +2494,8 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 		}
 		fn get_font_face() -> font_face {
 			let free_record: @font_face_free_record = @{
-				library: 0 as ctypes::intptr_t,
-				face: 0 as ctypes::intptr_t,
+				library: 0 as libc::intptr_t,
+				face: 0 as libc::intptr_t,
 				internal: ccairo::cairo_font_face_reference(ccairo::cairo_get_font_face(**self))
 			};
 			
@@ -2512,25 +2508,25 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 			ret wrap_scaled_font(ccairo::cairo_scaled_font_reference(ccairo::cairo_get_scaled_font(**self)));
 		}
 		fn show_text(text: str) unsafe {
-			let bytes = core::str::bytes(text);
+			let mut bytes = core::str::bytes(text);
 		
 			core::vec::push(bytes, 0 as u8);
 		
 			ccairo::cairo_show_text(**self, core::vec::unsafe::to_ptr(bytes));
 		}
 		fn show_glyphs(glyphs: [glyph]) unsafe {
-			let cglyphs: [core::ctypes::intptr_t] = [];
+			let mut cglyphs: [core::libc::intptr_t] = [];
 		
 			for glyph in glyphs {
 				cglyphs += [glyph.get_internal()];
 			}
 		
-			ccairo::cairo_show_glyphs(**self, core::vec::unsafe::to_ptr(cglyphs) as core::ctypes::intptr_t, core::vec::len(cglyphs) as core::ctypes::c_int);
+			ccairo::cairo_show_glyphs(**self, core::vec::unsafe::to_ptr(cglyphs) as core::libc::intptr_t, core::vec::len(cglyphs) as core::libc::c_int);
 		}
 		fn show_text_glyphs(text: str, glyphs: [glyph], clusters: [text_cluster], cluster_flags: text_cluster_flags) unsafe {
-			let cglyphs: [core::ctypes::intptr_t] = [];
-			let cclusters: [core::ctypes::intptr_t] = [];
-			let bytes = core::str::bytes(text);
+			let mut cglyphs: [core::libc::intptr_t] = [];
+			let mut cclusters: [core::libc::intptr_t] = [];
+			let mut bytes = core::str::bytes(text);
 		
 			core::vec::push(bytes, 0 as u8);
 		
@@ -2541,33 +2537,33 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 				cclusters += [cluster.get_internal()];
 			}
 		
-			ccairo::cairo_show_text_glyphs(**self, core::vec::unsafe::to_ptr(bytes), core::vec::len(bytes) as core::ctypes::c_int, core::vec::unsafe::to_ptr(cglyphs) as core::ctypes::intptr_t, core::vec::len(cglyphs) as core::ctypes::c_int, core::vec::unsafe::to_ptr(cclusters) as core::ctypes::intptr_t, core::vec::len(cclusters) as core::ctypes::c_int, cluster_flags as core::ctypes::c_int);
+			ccairo::cairo_show_text_glyphs(**self, core::vec::unsafe::to_ptr(bytes), core::vec::len(bytes) as core::libc::c_int, core::vec::unsafe::to_ptr(cglyphs) as core::libc::intptr_t, core::vec::len(cglyphs) as core::libc::c_int, core::vec::unsafe::to_ptr(cclusters) as core::libc::intptr_t, core::vec::len(cclusters) as core::libc::c_int, cluster_flags as core::libc::c_int);
 		}
 		fn font_extents() -> font_extents {
 			let record: font_extents_record = {
-				mutable ascent: 0.0,
-				mutable descent: 0.0,
-				mutable height: 0.0,
-				mutable max_x_advance: 0.0,
-				mutable max_y_advance: 0.0
+				mut ascent: 0.0,
+				mut descent: 0.0,
+				mut height: 0.0,
+				mut max_x_advance: 0.0,
+				mut max_y_advance: 0.0
 			};
-			let result = wrap_font_extents(core::ptr::addr_of(record) as core::ctypes::intptr_t);
+			let result = wrap_font_extents(core::ptr::addr_of(record) as core::libc::intptr_t);
 		
 			ccairo::cairo_font_extents(**self, result.get_internal());
 		
 			ret result;
 		}
 		fn text_extents(text: str) -> text_extents unsafe {
-			let bytes = core::str::bytes(text);
+			let mut bytes = core::str::bytes(text);
 			let record = @{
-				mutable x_bearing: 0.0,
-				mutable y_bearing: 0.0,
-				mutable width: 0.0,
-				mutable height: 0.0,
-				mutable x_advance: 0.0,
-				mutable y_advance: 0.0
+				mut x_bearing: 0.0,
+				mut y_bearing: 0.0,
+				mut width: 0.0,
+				mut height: 0.0,
+				mut x_advance: 0.0,
+				mut y_advance: 0.0
 			};
-			let result = wrap_text_extents(core::ptr::addr_of(record) as core::ctypes::intptr_t);
+			let result = wrap_text_extents(core::ptr::addr_of(record) as core::libc::intptr_t);
 		
 			core::vec::push(bytes, 0 as u8);
 			ccairo::cairo_text_extents(**self, core::vec::unsafe::to_ptr(bytes), result.get_internal());
@@ -2576,21 +2572,21 @@ fn wrap_context(internal: core::ctypes::intptr_t) -> context {
 		}
 		fn glyph_extents(glyphs: [glyph]) -> text_extents unsafe {
 			let record = @{
-				mutable x_bearing: 0.0,
-				mutable y_bearing: 0.0,
-				mutable width: 0.0,
-				mutable height: 0.0,
-				mutable x_advance: 0.0,
-				mutable y_advance: 0.0
+				mut x_bearing: 0.0,
+				mut y_bearing: 0.0,
+				mut width: 0.0,
+				mut height: 0.0,
+				mut x_advance: 0.0,
+				mut y_advance: 0.0
 			};
-			let result = wrap_text_extents(core::ptr::addr_of(record) as core::ctypes::intptr_t);
-			let cglyphs: [core::ctypes::intptr_t] = [];
+			let result = wrap_text_extents(core::ptr::addr_of(record) as core::libc::intptr_t);
+			let mut cglyphs: [core::libc::intptr_t] = [];
 		
 			for glyph in glyphs {
 				cglyphs += [glyph.get_internal()];
 			}
 		
-			ccairo::cairo_glyph_extents(**self, core::vec::unsafe::to_ptr(cglyphs) as core::ctypes::intptr_t, core::vec::len(cglyphs) as core::ctypes::c_int, result.get_internal());
+			ccairo::cairo_glyph_extents(**self, core::vec::unsafe::to_ptr(cglyphs) as core::libc::intptr_t, core::vec::len(cglyphs) as core::libc::c_int, result.get_internal());
 		
 			ret result;
 		}
@@ -2613,14 +2609,14 @@ fn mk_context(surface: surface) -> context {
  * Utilities
  */
 fn format_stride_for_width(format: format, width: uint) -> uint {
-	ret ccairo::cairo_format_stride_for_width(format as core::ctypes::c_int, width as core::ctypes::c_int) as uint;
+	ret ccairo::cairo_format_stride_for_width(format as core::libc::c_int, width as core::libc::c_int) as uint;
 }
 fn status_to_str(status: status) -> str unsafe {
-	ret core::str::from_cstr(ccairo::cairo_status_to_string(status as core::ctypes::c_int));
+	ret core::str::unsafe::from_c_str(ccairo::cairo_status_to_string(status as core::libc::c_int));
 }
 fn get_version() -> str {
 	ret "v0.2.1pre";
 }
 fn get_cairo_version() -> str unsafe {
-	ret core::str::from_cstr(ccairo::cairo_version_string());
+	ret core::str::unsafe::from_c_str(ccairo::cairo_version_string());
 }
