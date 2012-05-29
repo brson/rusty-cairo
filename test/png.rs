@@ -3,8 +3,8 @@ use cairo;
 
 #[test]
 fn png() {
-	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, 200u, 100u);
-	let context: cairo::context = cairo::mk_context(surface);
+	let mut surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, 200u, 100u);
+	let mut context: cairo::context = cairo::mk_context(surface);
 	
 	context.set_source_rgb(0.0, 0.0, 0.0);
 	context.paint();

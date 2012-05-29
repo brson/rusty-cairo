@@ -19,7 +19,7 @@ fn a1_bug() {
 	context.set_source_rgb(0.0, 0.0, 0.0);
 	context.paint();
 	
-	for point in points {
+	for points.each { |point|
 		context.line_to(point[0], point[1]);
 	}
 	

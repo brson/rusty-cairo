@@ -5,7 +5,7 @@ use cairo;
 fn toy_font_face() {
 	let surface: cairo::surface = cairo::mk_image_surface(cairo::FORMAT_RGB24, 0u, 0u);
 	let context: cairo::context = cairo::mk_context(surface);
-	let font: cairo::font_face = context.get_font_face();
+	let mut font: cairo::font_face = context.get_font_face();
 	
 	assert font.get_type() == cairo::FONT_TYPE_TOY;
 	assert font.get_toy_slant() == cairo::FONT_SLANT_NORMAL;
