@@ -1,6 +1,6 @@
 all:
 	mkdir -p ./lib
-	rustc --lib ./cairo.rc --out-dir ./lib
+	rustc ./src/cairo.rc --out-dir ./lib
 test: all
 	rustc --test -L ./lib ./test/simple.rs --out-dir ./test
 	rustc --test -L ./lib ./test/a1-bug.rs --out-dir ./test

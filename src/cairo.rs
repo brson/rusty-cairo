@@ -887,7 +887,7 @@ iface surface {
 	fn ps_begin_page_setup_comments();
 	fn ps_comment(text: str);
 
-	fn image_get_data() -> [mut u8];
+	fn image_get_data() -> @~[mut u8];
 	fn image_get_format() -> format;
 	fn image_get_width() -> uint;
 	fn image_get_height() -> uint;
@@ -963,10 +963,10 @@ fn wrap_surface(internal: libc::intptr_t) -> surface {
 		
 			ccairo::cairo_ps_surface_dsc_comment(self.val(), vec::unsafe::to_ptr(bytes));
 		}
-		fn image_get_data() -> [mut u8] unsafe { // TODO test if this is mut, as rust might not keep the same pointers but reallocate
+		fn image_get_data() -> @~[mut u8] unsafe { // TODO test if this is mut, as rust might not keep the same pointers but reallocate
 			let data = ccairo::cairo_image_surface_get_data(self.val()); // FIXME boxed free
-		
-			ret vec::to_mut(vec::unsafe::from_buf(data, self.image_get_stride() * self.image_get_height()));
+
+			ret @vec::to_mut(vec::unsafe::from_buf(data, self.image_get_stride() * self.image_get_height()));
 		}
 		fn image_get_format() -> format {
 			ret ccairo::cairo_image_surface_get_format(self.val()) as format;
@@ -1174,7 +1174,8 @@ fn mk_image_surface_from_file(file: str) -> surface unsafe {
 	
 	ret result;
 }
-fn mk_image_surface_from_data(data: [u8], format: format, width: uint, height: uint, stride: uint) -> surface unsafe {
+fn mk_image_surface_from_data(data: ~[u8], format: format, width: uint, 
+height: uint, stride: uint) -> surface unsafe {
 	let result = wrap_surface(ccairo::cairo_image_surface_create_for_data(vec::unsafe::to_ptr(data), format as libc::c_int, width as libc::c_int, height as libc::c_int, stride as libc::c_int));
 	let status = result.get_status();
 	
@@ -1312,7 +1313,7 @@ fn wrap_pattern(internal: libc::intptr_t) -> pattern {
 			ccairo::cairo_pattern_set_matrix(self.val(), matrix.get_internal());
 		}
 		fn get_matrix() -> matrix {
-			let matrix: matrix = mk_matrix([
+			let matrix: matrix = mk_matrix(~[
 				0.0, 0.0,
 				0.0, 0.0,
 				0.0, 0.0
@@ -1386,10 +1387,10 @@ fn mk_pattern_from_surface(surface: surface) -> pattern {
 
 iface matrix {
 	fn get_internal() -> libc::intptr_t;
-	fn get_record() -> matrix_record;
+	fn get_record() -> @matrix_record;
 	
-	fn get_values() -> [float];
-	fn set_values(values: [float]);
+	fn get_values() -> ~[float];
+	fn set_values(values: ~[float]);
 	fn set_identity();
 	fn set_translate(x: float, y: float);
 	fn set_scale(x: float, y: float);
@@ -1422,20 +1423,20 @@ fn wrap_matrix(internal: libc::intptr_t) -> matrix {
 		fn get_internal() -> libc::intptr_t {
 			ret self.val() as libc::intptr_t;
 		}
-		fn get_record() -> matrix_record unsafe {
-			ret *(self.get_internal() as *matrix_record);
+		fn get_record() -> @matrix_record unsafe {
+			ret @(*(self.get_internal() as *matrix_record));
 		}
 		
-		fn get_values() -> [float] {
-			let record: matrix_record = self.get_record();
+		fn get_values() -> ~[float] {
+			let record: @matrix_record = self.get_record();
 		
-			ret [
+			ret ~[
 				record.xx, record.yx,
 				record.xy, record.yy,
 				record.x0, record.y0
 			];
 		}
-		fn set_values(values: [float]) {
+		fn set_values(values: ~[float]) {
 			ccairo::cairo_matrix_init(self.val(), values[0], values[1], values[2], values[3], values[4], values[5]);
 		}
 		fn set_identity() {
@@ -1463,7 +1464,7 @@ fn wrap_matrix(internal: libc::intptr_t) -> matrix {
 			ccairo::cairo_matrix_invert(self.val());
 		}
 		fn multiply(other: matrix) -> matrix {
-			let result: matrix = mk_matrix([
+			let result: matrix = mk_matrix(~[
 				0.0, 0.0,
 				0.0, 0.0,
 				0.0, 0.0
@@ -1493,7 +1494,7 @@ fn wrap_matrix(internal: libc::intptr_t) -> matrix {
 	
 	ret @matrix_res(internal) as matrix;
 }
-fn mk_matrix(values: [float]) -> matrix {
+fn mk_matrix(values: ~[float]) -> matrix {
 	let record: matrix_record = {
 		mut xx: 0.0,
 		mut yx: 0.0,
@@ -1547,7 +1548,7 @@ fn wrap_path(internal: libc::intptr_t) -> path {
 
 iface glyph {
 	fn get_internal() -> libc::intptr_t;
-	fn get_record() -> glyph_record;
+	fn get_record() -> @glyph_record;
 
 	fn set_index(index: uint);
 	fn set_x(x: float);
@@ -1576,8 +1577,8 @@ fn wrap_glyph(internal: libc::intptr_t) -> glyph {
 		fn get_internal() -> libc::intptr_t {
 			ret self.val() as libc::intptr_t;
 		}
-		fn get_record() -> glyph_record unsafe {
-			ret *(self.get_internal() as *glyph_record);
+		fn get_record() -> @glyph_record unsafe {
+			ret @(*(self.get_internal() as *glyph_record));
 		}
 		
 		fn set_index(index: uint) {
@@ -1614,7 +1615,7 @@ fn mk_glyph(index: uint, x: float, y: float) -> glyph {
 
 iface text_cluster {
 	fn get_internal() -> libc::intptr_t;
-	fn get_record() -> text_cluster_record;
+	fn get_record() -> @text_cluster_record;
 	
 	fn set_num_bytes(num_bytes: uint);
 	fn set_num_glyphs(num_glyphs: uint);
@@ -1641,8 +1642,8 @@ fn wrap_text_cluster(internal: libc::intptr_t) -> text_cluster {
 		fn get_internal() -> libc::intptr_t {
 			ret self.val() as libc::intptr_t;
 		}
-		fn get_record() -> text_cluster_record unsafe {
-			ret *(self.get_internal() as *text_cluster_record);
+		fn get_record() -> @text_cluster_record unsafe {
+			ret @(*(self.get_internal() as *text_cluster_record));
 		}
 		
 		fn set_num_bytes(num_bytes: uint) {
@@ -1672,7 +1673,7 @@ fn mk_text_cluster(num_bytes: uint, num_glyphs: uint) -> text_cluster {
 
 iface font_extents {
 	fn get_internal() -> libc::intptr_t;
-	fn get_record() -> font_extents_record;
+	fn get_record() -> @font_extents_record;
 
 	fn get_ascent() -> float;
 	fn get_descent() -> float;
@@ -1700,8 +1701,8 @@ fn wrap_font_extents(internal: libc::intptr_t) -> font_extents {
 		fn get_internal() -> libc::intptr_t {
 			ret self.val() as libc::intptr_t;
 		}
-		fn get_record() -> font_extents_record unsafe {
-			ret *(self.get_internal() as *font_extents_record);
+		fn get_record() -> @font_extents_record unsafe {
+			ret @(*(self.get_internal() as *font_extents_record));
 		}
 		
 		fn get_ascent() -> float {
@@ -1726,7 +1727,7 @@ fn wrap_font_extents(internal: libc::intptr_t) -> font_extents {
 
 iface text_extents {
 	fn get_internal() -> libc::intptr_t;
-	fn get_record() -> text_extents_record;
+	fn get_record() -> @text_extents_record;
 
 	fn get_x_bearing() -> float;
 	fn get_y_bearing() -> float;
@@ -1756,8 +1757,8 @@ fn wrap_text_extents(internal: libc::intptr_t) -> text_extents {
 		fn get_internal() -> libc::intptr_t {
 			ret self.val() as libc::intptr_t;
 		}
-		fn get_record() -> text_extents_record unsafe {
-			ret *(self.get_internal() as *text_extents_record);
+		fn get_record() -> @text_extents_record unsafe {
+			ret @(*(self.get_internal() as *text_extents_record));
 		}
 		
 		fn get_x_bearing() -> float {
@@ -1920,7 +1921,7 @@ iface scaled_font {
 	fn get_status() -> status;
 	fn extents() -> font_extents;
 	fn text_extents(text: str) -> text_extents;
-	fn glyph_extents(glyphs: [glyph]) -> text_extents;
+	fn glyph_extents(glyphs: ~[glyph]) -> text_extents;
 	fn get_font_face() -> font_face;
 	fn get_font_options() -> font_options;
 	fn get_font_matrix() -> matrix;
@@ -1983,7 +1984,8 @@ fn wrap_scaled_font(internal: libc::intptr_t) -> scaled_font {
 		
 			ret result;
 		}
-		fn glyph_extents(glyphs: [glyph]) -> text_extents unsafe {
+		fn glyph_extents(glyphs: ~[glyph]) -> text_extents 
+unsafe {
 			let record: text_extents_record = {
 				mut x_bearing: 0.0,
 				mut y_bearing: 0.0,
@@ -1993,10 +1995,10 @@ fn wrap_scaled_font(internal: libc::intptr_t) -> scaled_font {
 				mut y_advance: 0.0
 			};
 			let result = wrap_text_extents(ptr::addr_of(record) as libc::intptr_t);
-			let mut cglyphs: [libc::intptr_t] = [];
+			let mut cglyphs: ~[libc::intptr_t] = ~[];
 		
 		        for glyphs.each |glyph| {
-				cglyphs += [glyph.get_internal()];
+				cglyphs += ~[glyph.get_internal()];
 			}
 		
 			ccairo::cairo_scaled_font_glyph_extents(self.val(), vec::unsafe::to_ptr(cglyphs) as libc::intptr_t, vec::len(cglyphs) as libc::c_int, result.get_internal());
@@ -2020,7 +2022,7 @@ fn wrap_scaled_font(internal: libc::intptr_t) -> scaled_font {
 			ret options;
 		}
 		fn get_font_matrix() -> matrix {
-			let matrix: matrix = mk_matrix([
+			let matrix: matrix = mk_matrix(~[
 				0.0, 0.0,
 				0.0, 0.0,
 				0.0, 0.0
@@ -2031,7 +2033,7 @@ fn wrap_scaled_font(internal: libc::intptr_t) -> scaled_font {
 			ret matrix;
 		}
 		fn get_ctm() -> matrix {
-			let matrix: matrix = mk_matrix([
+			let matrix: matrix = mk_matrix(~[
 				0.0, 0.0,
 				0.0, 0.0,
 				0.0, 0.0
@@ -2042,7 +2044,7 @@ fn wrap_scaled_font(internal: libc::intptr_t) -> scaled_font {
 			ret matrix;
 		}
 		fn get_scale_matrix() -> matrix {
-			let matrix: matrix = mk_matrix([
+			let matrix: matrix = mk_matrix(~[
 				0.0, 0.0,
 				0.0, 0.0,
 				0.0, 0.0
@@ -2167,9 +2169,9 @@ iface context {
 	fn get_source() -> pattern;
 	fn set_antialias(antialias: antialias);
 	fn get_antialias() -> antialias;
-	fn set_dash(dashes: [float], offset: float);
+	fn set_dash(dashes: ~[float], offset: float);
 	fn get_dash_count() -> uint;
-	fn get_dash() -> [float];
+	fn get_dash() -> ~[float];
 	fn get_dash_offset() -> float;
 	fn set_fill_rule(rule: fill_rule);
 	fn get_fill_rule() -> fill_rule;
@@ -2219,7 +2221,7 @@ iface context {
 	fn line_to(x: float, y: float);
 	fn move_to(x: float, y: float);
 	fn rectangle(x: float, y: float, width: float, height: float);
-	fn glyph_path(glyphs: [glyph]);
+	fn glyph_path(glyphs: ~[glyph]);
 	fn text_path(text: str);
 	fn rel_curve_to(x1: float, y1: float, x2: float, y2: float, x3: float, y3: float);
 	fn rel_line_to(x: float, y: float);
@@ -2249,11 +2251,11 @@ iface context {
 	fn set_scaled_font(font: scaled_font);
 	fn get_scaled_font() -> scaled_font;
 	fn show_text(text: str);
-	fn show_glyphs (glyphs: [glyph]);
-	fn show_text_glyphs(text: str, glyphs: [glyph], clusters: [text_cluster], cluster_flags: text_cluster_flags);
+	fn show_glyphs (glyphs: ~[glyph]);
+	fn show_text_glyphs(text: str, glyphs: ~[glyph], clusters: ~[text_cluster], cluster_flags: text_cluster_flags);
 	fn font_extents() -> font_extents;
 	fn text_extents(text: str) -> text_extents;
-	fn glyph_extents(glyphs: [glyph]) -> text_extents;
+	fn glyph_extents(glyphs: ~[glyph]) -> text_extents;
 }
 
 class context_res {
@@ -2324,14 +2326,14 @@ fn wrap_context(internal: libc::intptr_t) -> context {
 		fn get_antialias() -> antialias {
 			ret ccairo::cairo_get_antialias(self.val()) as antialias;
 		}
-		fn set_dash(dashes: [float], offset: float) unsafe {
+		fn set_dash(dashes: ~[float], offset: float) unsafe {
 			ccairo::cairo_set_dash(self.val(), vec::unsafe::to_ptr(dashes), vec::len(dashes) as libc::c_int, offset);
 		}
 		fn get_dash_count() -> uint {
 			ret ccairo::cairo_get_dash_count(self.val()) as uint;
 		}
-		fn get_dash() -> [float] unsafe {
-			let dashes: [float] = [];
+		fn get_dash() -> ~[float] unsafe {
+			let dashes: ~[float] = ~[];
 		
 			ccairo::cairo_get_dash(self.val(), vec::unsafe::to_ptr(dashes), ptr::null());
 		
@@ -2512,11 +2514,11 @@ fn wrap_context(internal: libc::intptr_t) -> context {
 		fn rectangle(x: float, y: float, width: float, height: float) {
 			ccairo::cairo_rectangle(self.val(), x, y, width, height);
 		}
-		fn glyph_path(glyphs: [glyph]) unsafe {
-			let mut cglyphs: [libc::intptr_t] = [];
+		fn glyph_path(glyphs: ~[glyph]) unsafe {
+			let mut cglyphs: ~[libc::intptr_t] = ~[];
 		
 		        for glyphs.each |glyph| {
-				cglyphs += [glyph.get_internal()];
+				cglyphs += ~[glyph.get_internal()];
 			}
 		
 			ccairo::cairo_glyph_path(self.val(), vec::unsafe::to_ptr(cglyphs) as libc::intptr_t, vec::len(cglyphs) as libc::c_int);
@@ -2657,27 +2659,27 @@ fn wrap_context(internal: libc::intptr_t) -> context {
 		
 			ccairo::cairo_show_text(self.val(), vec::unsafe::to_ptr(bytes));
 		}
-		fn show_glyphs(glyphs: [glyph]) unsafe {
-			let mut cglyphs: [libc::intptr_t] = [];
+		fn show_glyphs(glyphs: ~[glyph]) unsafe {
+			let mut cglyphs: ~[libc::intptr_t] = ~[];
 		
 		        for glyphs.each |glyph| {
-				cglyphs += [glyph.get_internal()];
+				cglyphs += ~[glyph.get_internal()];
 			}
 		
 			ccairo::cairo_show_glyphs(self.val(), vec::unsafe::to_ptr(cglyphs) as libc::intptr_t, vec::len(cglyphs) as libc::c_int);
 		}
-		fn show_text_glyphs(text: str, glyphs: [glyph], clusters: [text_cluster], cluster_flags: text_cluster_flags) unsafe {
-			let mut cglyphs: [libc::intptr_t] = [];
-			let mut cclusters: [libc::intptr_t] = [];
+		fn show_text_glyphs(text: str, glyphs: ~[glyph], clusters: ~[text_cluster], cluster_flags: text_cluster_flags) unsafe {
+			let mut cglyphs: ~[libc::intptr_t] = ~[];
+			let mut cclusters: ~[libc::intptr_t] = ~[];
 			let mut bytes = str::bytes(text);
 		
 			vec::push(bytes, 0 as u8);
 		
 		        for glyphs.each |glyph| {
-				cglyphs += [glyph.get_internal()];
+				cglyphs += ~[glyph.get_internal()];
 			}
 		        for clusters.each |cluster| {
-				cclusters += [cluster.get_internal()];
+				cclusters += ~[cluster.get_internal()];
 			}
 		
 			ccairo::cairo_show_text_glyphs(self.val(), vec::unsafe::to_ptr(bytes), vec::len(bytes) as libc::c_int, vec::unsafe::to_ptr(cglyphs) as libc::intptr_t, vec::len(cglyphs) as libc::c_int, vec::unsafe::to_ptr(cclusters) as libc::intptr_t, vec::len(cclusters) as libc::c_int, cluster_flags as libc::c_int);
@@ -2713,7 +2715,7 @@ fn wrap_context(internal: libc::intptr_t) -> context {
 		
 			ret result;
 		}
-		fn glyph_extents(glyphs: [glyph]) -> text_extents unsafe {
+		fn glyph_extents(glyphs: ~[glyph]) -> text_extents unsafe {
 			let record = @{
 				mut x_bearing: 0.0,
 				mut y_bearing: 0.0,
@@ -2723,10 +2725,10 @@ fn wrap_context(internal: libc::intptr_t) -> context {
 				mut y_advance: 0.0
 			};
 			let result = wrap_text_extents(ptr::addr_of(record) as libc::intptr_t);
-			let mut cglyphs: [libc::intptr_t] = [];
+			let mut cglyphs: ~[libc::intptr_t] = ~[];
 		
 		        for glyphs.each |glyph| {
-				cglyphs += [glyph.get_internal()];
+				cglyphs += ~[glyph.get_internal()];
 			}
 		
 			ccairo::cairo_glyph_extents(self.val(), vec::unsafe::to_ptr(cglyphs) as libc::intptr_t, vec::len(cglyphs) as libc::c_int, result.get_internal());
